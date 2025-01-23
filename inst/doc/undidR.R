@@ -1,0 +1,153 @@
+## ----include = FALSE----------------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+## ----setup--------------------------------------------------------------------
+library(undidR)
+
+## ----schematic, echo=FALSE, fig.align='center', out.width='90%', fig.cap="Schematic of the UNDID framework."----
+knitr::include_graphics("figures/undidR_schematic.png")
+
+## -----------------------------------------------------------------------------
+# First, an initializing CSV is created detailing the silos
+# and their treatment times. Control silos (here, 73 and 46)
+# should be labelled with "control".
+init <- create_init_csv(silo_names = c("73", "46", "71", "58"),
+                        start_times = "1989",
+                        end_times = "2000",
+                        treatment_times = c("control", "control",
+                                            "1991", "1991"))
+init
+
+# After the initializing CSV file is created, `create_diff_df()`
+# can be called. This creates the empty differences data frame which
+# will then be filled out at each individual silo for its respective portion.
+init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
+                               winslash = "/", mustWork = FALSE)
+empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
+                                freq = "yearly")
+empty_diff_df
+
+## -----------------------------------------------------------------------------
+# The initializing CSV for staggered adoption is created in the same way.
+# When `create_diff_df()` is run, it will automatically detect whether or not
+# the initial setup is for a common adoption or staggered adoption scenario.
+init <- create_init_csv(silo_names = c("73", "46", "54", "23", "86", "32",
+                                       "71", "58", "64", "59", "85", "57"),
+                        start_times = "1989",
+                        end_times = "2000",
+                        treatment_times = c(rep("control", 6),
+                                            "1991", "1993", "1996", "1997",
+                                            "1997", "1998"))
+init
+
+# Creating the empty differences data frame and associated CSV file is
+# the same for the case of staggered adoption as it is for common adoption.
+init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
+                               winslash = "/", mustWork = FALSE)
+empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
+                                freq = "yearly",
+                                covariates = c("asian", "black", "male"))
+head(empty_diff_df, 4)
+
+## -----------------------------------------------------------------------------
+# When calling `undid_stage_two()`, ensure that the `time_column` of
+# the `silo_df` contains only character values, i.e. date strings.
+silo_data <- silo71
+silo_data$year <- as.character(silo_data$year)
+empty_diff_filepath <- system.file("extdata/common", "empty_diff_df.csv",
+                                   package = "undidR")
+stage2 <- undid_stage_two(empty_diff_filepath, silo_name = "71",
+                          silo_df = silo_data, time_column = "year",
+                          outcome_column = "coll", silo_date_format = "yyyy")
+head(stage2$diff_df, 4)
+head(stage2$trends_data, 4)
+
+## -----------------------------------------------------------------------------
+# Here we can see that calling `undid_stage_two()` for staggered adoption
+# is no different than calling `undid_stage_two()` for common adoption.
+silo_data <- silo71
+silo_data$year <- as.character(silo_data$year)
+empty_diff_filepath <- system.file("extdata/staggered", "empty_diff_df.csv",
+                                    package = "undidR")
+stage2 <- undid_stage_two(empty_diff_filepath, silo_name = "71",
+                          silo_df = silo_data, time_column = "year",
+                          outcome_column = "coll", silo_date_format = "yyyy")
+head(stage2$diff_df, 4)
+head(stage2$trends_data, 4)
+
+## ----fig.width=6, fig.height=4, out.width = "70%", dpi=300, fig.align="center"----
+# `undid_stage_three()`, given a `dir_path`, will search that folder
+# for all CSV files that begin with "filled_diff_df_" and stitch
+# them together in order to compute the group level ATTs, aggregate ATT
+# and associated standard errors and p-values.
+dir_path <- system.file("extdata/common", package = "undidR")
+results <- undid_stage_three(dir_path, covariates = FALSE)
+results
+
+# We can also view a parallel trends plot of our silos by callling
+# `plot_parallel_trends()`. This function will search a folder for all
+# CSV files that start with "trends_data" and combine them. The combined
+# data is returned by the function.
+trends <- plot_parallel_trends(
+  dir_path,
+  simplify_legend = FALSE, # Setting to `FALSE` puts every silo in legend
+  lwd = 3,                 # Set line width
+  ylim = c(0, 1),          # (min, max) of y-axis
+  xdates = as.Date(c("1989-01-01",
+                     "1991-01-01",
+                     "1993-01-01", # Explicity declare dates on x-axis
+                     "1995-01-01",
+                     "1997-01-01",
+                     "1999-01-01")),
+  date_format = "%Y", # Specify x-axis date format
+  ylabels = c(0, 0.25, 0.5, 0.75, 1), # Values on y-axis
+  legend_location = "topleft", # Where should the legend go?
+  legend_on = TRUE, # Defaults `TRUE`, can be set to `FALSE` to omit legend
+  ylab = "coll", # y-axis title
+  treatment_colour = c("red", # Set colours of treatment silos
+                       "coral"),
+  control_colour = c("#2fa7cf", # Colours can be entered as hexcodes
+                     "skyblue")
+)
+head(trends, 4)
+
+## ----fig.width=6, fig.height=4, out.width = "70%", dpi=300, fig.align="center"----
+# When calling `undid_stage_three()` for staggered adoption it is
+# important to specify the aggregation method, `agg`.
+dir_path <- system.file("extdata/staggered", package = "undidR")
+results <- undid_stage_three(dir_path, agg = "silo", covariates = TRUE,
+                             nperm = 501)
+
+# The `nperm` parameter specifies how many permutations
+# to consider for randomization inference.
+
+results
+
+# If we have many silos, but want to view a parallel trends plot
+# we can set `combine = TRUE` when calling `plot_parallel_trends()`
+# which will combine all treatment silos into a single line, and all
+# control silos into a single line.
+trends <- plot_parallel_trends(
+  dir_path,
+  combine = TRUE, # Plots one line for control and one line for treated
+  simplify_legend = TRUE, # Reduces legend to simply "Control" and "Treated"
+  lwd = 3,                 # Set line width
+  ylim = c(0.2, 0.6),          # (min, max) of y-axis
+  xdates = as.Date(c("1989-01-01",
+                     "1991-01-01",
+                     "1993-01-01", # Explicity declare dates on x-axis
+                     "1995-01-01",
+                     "1997-01-01",
+                     "1999-01-01")),
+  date_format = "%Y", # Specify x-axis date format
+  ylabels = c(0.2, 0.4, 0.6), # Values on y-axis
+  legend_location = "topright", # Where should the legend go?
+  treatment_indicator_lwd = 2, # line width for the treatment indicator lines
+  treatment_indicator_alpha = 0.2, # transparency for treatment indicator lines
+  treatment_indicator_col = "red" # colour for treatment indicator lines
+)
+head(trends, 4)
+

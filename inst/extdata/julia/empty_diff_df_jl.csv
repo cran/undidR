@@ -1,0 +1,11 @@
+silo_name,treat,common_treatment_time,start_time,end_time,weights,diff_estimate,diff_var,diff_estimate_covariates,diff_var_covariates,covariates,date_format,freq
+59,1,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+23,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+85,1,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+86,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+11,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+95,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+14,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+12,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+13,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year
+15,0,1997,1989-01-01,2000-01-01,standard,missing,missing,missing,missing,asian;black;male,yyyy,1 year

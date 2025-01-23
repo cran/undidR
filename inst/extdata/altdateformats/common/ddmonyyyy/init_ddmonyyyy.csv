@@ -1,0 +1,5 @@
+silo_name,start_time,end_time,treatment_time
+73,01jan1989,01jan2000,control
+46,01jan1989,01jan2000,control
+71,01jan1989,01jan2000,01jan1991
+58,01jan1989,01jan2000,01jan1991
