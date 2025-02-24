@@ -351,10 +351,10 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
   x <- silo_df$time
   x <- ifelse(x >= treatment_time, 1, 0)
-  x <- cbind(1, x)
-  y <- as.numeric(silo_df$outcome)
   count_post <- sum(x == 1)
   count_pre <- sum(x == 0)
+  x <- cbind(1, x)
+  y <- as.numeric(silo_df$outcome)
   if (count_post == 0 || count_pre == 0) {
     stop(paste("Pre-treatment n. obs:", count_pre, "\nPost-treatment n. obs:",
                count_post,
@@ -362,7 +362,7 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   }
 
   if (weights == "standard") {
-    diff_df$weights[1] <- sum(x) / length(x)
+    diff_df$weights[1] <- (count_post) / (count_pre + count_post)
   }
 
   reg <- .regress(x, y)

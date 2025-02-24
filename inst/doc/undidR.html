@@ -387,7 +387,7 @@ parameter.</p>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                        <span class="at">end_times =</span> <span class="st">&quot;2000&quot;</span>,</span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                        <span class="at">treatment_times =</span> <span class="fu">c</span>(<span class="st">&quot;control&quot;</span>, <span class="st">&quot;control&quot;</span>,</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>                                            <span class="st">&quot;1991&quot;</span>, <span class="st">&quot;1991&quot;</span>))</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/init.csv</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/init.csv</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>init</span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;   silo_name start_time end_time treatment_time</span></span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; 1        73       1989     2000        control</span></span>
@@ -402,7 +402,7 @@ parameter.</p>
 <span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>                               <span class="at">winslash =</span> <span class="st">&quot;/&quot;</span>, <span class="at">mustWork =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>empty_diff_df <span class="ot">&lt;-</span> <span class="fu">create_diff_df</span>(init_filepath, <span class="at">date_format =</span> <span class="st">&quot;yyyy&quot;</span>,</span>
 <span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>                                <span class="at">freq =</span> <span class="st">&quot;yearly&quot;</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/empty_diff_df.csv</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/empty_diff_df.csv</span></span>
 <span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>empty_diff_df</span>
 <span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt;   silo_name treat common_treatment_time start_time   end_time  weights</span></span>
 <span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 1        73     0                  1991 1989-01-01 2000-01-01 standard</span></span>
@@ -432,7 +432,7 @@ parameter.</p>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                        <span class="at">treatment_times =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;control&quot;</span>, <span class="dv">6</span>),</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>                                            <span class="st">&quot;1991&quot;</span>, <span class="st">&quot;1993&quot;</span>, <span class="st">&quot;1996&quot;</span>, <span class="st">&quot;1997&quot;</span>,</span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>                                            <span class="st">&quot;1997&quot;</span>, <span class="st">&quot;1998&quot;</span>))</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/init.csv</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/init.csv</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>init</span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt;    silo_name start_time end_time treatment_time</span></span>
 <span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; 1         73       1989     2000        control</span></span>
@@ -455,7 +455,7 @@ parameter.</p>
 <span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>empty_diff_df <span class="ot">&lt;-</span> <span class="fu">create_diff_df</span>(init_filepath, <span class="at">date_format =</span> <span class="st">&quot;yyyy&quot;</span>,</span>
 <span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>                                <span class="at">freq =</span> <span class="st">&quot;yearly&quot;</span>,</span>
 <span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>                                <span class="at">covariates =</span> <span class="fu">c</span>(<span class="st">&quot;asian&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;male&quot;</span>))</span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/empty_diff_df.csv</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/empty_diff_df.csv</span></span>
 <span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="fu">head</span>(empty_diff_df, <span class="dv">4</span>)</span>
 <span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt;   silo_name gvar treat diff_times        gt RI start_time end_time</span></span>
 <span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; 1        73 1991     0  1991;1990 1991;1991  0       1989     2000</span></span>
@@ -496,11 +496,11 @@ two data frames which can be accessed by the suffixes of
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>stage2 <span class="ot">&lt;-</span> <span class="fu">undid_stage_two</span>(empty_diff_filepath, <span class="at">silo_name =</span> <span class="st">&quot;71&quot;</span>,</span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                          <span class="at">silo_df =</span> silo_data, <span class="at">time_column =</span> <span class="st">&quot;year&quot;</span>,</span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>                          <span class="at">outcome_column =</span> <span class="st">&quot;coll&quot;</span>, <span class="at">silo_date_format =</span> <span class="st">&quot;yyyy&quot;</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/filled_diff_df_71.csv</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/trends_data_71.csv</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/filled_diff_df_71.csv</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/trends_data_71.csv</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">head</span>(stage2<span class="sc">$</span>diff_df, <span class="dv">4</span>)</span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;   silo_name treat common_treatment_time start_time   end_time           weights</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 1        71     1                  1991 1989-01-01 2000-01-01 0.914762741652021</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 1        71     1                  1991 1989-01-01 2000-01-01 0.829525483304042</span></span>
 <span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;   diff_estimate    diff_var diff_estimate_covariates diff_var_covariates</span></span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 1    0.05879783 0.002597221                       NA                  NA</span></span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt;   covariates date_format   freq</span></span>
@@ -528,8 +528,8 @@ two data frames which can be accessed by the suffixes of
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>stage2 <span class="ot">&lt;-</span> <span class="fu">undid_stage_two</span>(empty_diff_filepath, <span class="at">silo_name =</span> <span class="st">&quot;71&quot;</span>,</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>                          <span class="at">silo_df =</span> silo_data, <span class="at">time_column =</span> <span class="st">&quot;year&quot;</span>,</span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>                          <span class="at">outcome_column =</span> <span class="st">&quot;coll&quot;</span>, <span class="at">silo_date_format =</span> <span class="st">&quot;yyyy&quot;</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/filled_diff_df_71.csv</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/Rtmpe8tbn0/trends_data_71.csv</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/filled_diff_df_71.csv</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpKCaup0/trends_data_71.csv</span></span>
 <span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">head</span>(stage2<span class="sc">$</span>diff_df, <span class="dv">4</span>)</span>
 <span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;   silo_name gvar treat diff_times        gt RI start_time   end_time</span></span>
 <span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 1        71 1991     1  1991;1990 1991;1991  0 1989-01-01 2000-01-01</span></span>
@@ -661,7 +661,7 @@ to see all the parameters and their descriptions.</p>
 <span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; 5         NA         NA            NA                NA                   NA</span></span>
 <span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; 6         NA         NA            NA                NA                   NA</span></span>
 <span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt;   agg_ATT_RI_p_val</span></span>
-<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; 1            0.172</span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; 1             0.21</span></span>
 <span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt; 2               NA</span></span>
 <span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; 3               NA</span></span>
 <span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; 4               NA</span></span>

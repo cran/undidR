@@ -1,3 +1,7 @@
+# undidR 1.0.1
+
+* Fixed the miscalculation of standard weights during stage two under common adoption scenarios.
+
 # undidR 1.0.0
 
 * Initial CRAN submission.
