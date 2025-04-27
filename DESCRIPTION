@@ -1,6 +1,6 @@
 Package: undidR
 Title: Difference-in-Differences with Unpoolable Data
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: 
     person("Eric", "Jamieson", email = "ericbrucejamieson@gmail.com", role = c("aut", "cre", "cph"))
 Maintainer: Eric Jamieson <ericbrucejamieson@gmail.com>
@@ -24,7 +24,7 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2025-02-24 19:30:40 UTC; Eric Bruce Jamieson
+Packaged: 2025-04-27 18:23:32 UTC; Eric Bruce Jamieson
 Author: Eric Jamieson [aut, cre, cph]
 Repository: CRAN
-Date/Publication: 2025-02-24 19:40:02 UTC
+Date/Publication: 2025-04-27 18:40:02 UTC

@@ -182,7 +182,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
 
   # Set xlabels as specified dates if xdates is specified. Otherwise use xticks
   if (!is.null(xdates)) {
-    xdates <- as.Date(xdates)
+    xdates <- as.Date(xdates, origin = "1970-01-01")
     xlabels <- xdates
   } else {
     xlabels <- sort(unique(trends_data$time))
@@ -292,7 +292,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
 
   }
 
-  trends_data$time <- as.Date(trends_data$time)
+  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   return(trends_data)
 
 }
@@ -356,8 +356,10 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
   silo_name <- c()
   y_vec <- c()
   treatment_times <- c()
-  trends_data$string_date <- .parse_date_to_string(as.Date(trends_data$time),
-                                                   trends_data$date_format[1])
+  trends_data$string_date <- .parse_date_to_string(
+    as.Date(trends_data$time, origin = "1970-01-01"),
+    trends_data$date_format[1]
+  )
   dates <- unique(trends_data$string_date)
   for (date in dates) {
     time <- c(time,
@@ -381,7 +383,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
     }
   }
   loc_date <- trends_data$date_format[1]
-  trends_data <- data.frame(time = as.Date(time),
+  trends_data <- data.frame(time = as.Date(time, origin  = "1970-01-01"),
                             silo_name = silo_name, y = y_vec,
                             treatment_time = treatment_times,
                             date_format = loc_date)
@@ -391,11 +393,13 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
     ylabels <- seq(from = yrange[1], to = yrange[2], length.out = yticks)
     ylabels <- round(ylabels, ydecimal)
   }
-  trends_data$time <- as.Date(trends_data$time)
+  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   plot(trends_data$time, trends_data$y, type = "n", xlab = xlab, ylab = ylab,
        main = title, ylim = ylim, xaxt = "n",
        yaxt = "n")
-  axis(1, at = xlabels, labels = format(as.Date(xlabels), date_format),
+  axis(1, at = xlabels, labels = format(as.Date(xlabels,
+                                                origin = "1970-01-01"),
+                                        date_format),
        cex.axis = xaxlabsz)
   axis(2, at = ylabels, labels = ylabels, cex.axis = yaxlabsz)
   col_palette <- c(treatment_colour[1], control_colour[1])
@@ -414,7 +418,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
   treatment_lines <- vapply(
     as.character(treatment_lines),
     .parse_string_to_date,
-    FUN.VALUE = as.Date(NA),
+    FUN.VALUE = as.Date(NA, origin = "1970-01-01"),
     date_format = as.character(trends_data$date_format[1])
   )
   for (treatment_line in treatment_lines) {
@@ -453,7 +457,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
                                  simplify_legend, legend_location,
                                  legend_cex, title, ylim) {
 
-  trends_data$time <- as.Date(trends_data$time)
+  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   # Set ylabels if not already specified
   yrange <- range(trends_data$y, na.rm = TRUE)
   if (is.null(ylabels)){
@@ -487,11 +491,13 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
     ylim <- range(trends_data$y, na.rm = TRUE)
   }
   # Initiate plot
-  trends_data$time <- as.Date(trends_data$time)
+  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   plot(trends_data$time, trends_data$y, type = "n", xlab = xlab, ylab = ylab,
        main = title, ylim = ylim, xaxt = "n",
        yaxt = "n")
-  axis(1, at = xlabels, labels = format(as.Date(xlabels), date_format),
+  axis(1, at = xlabels, labels = format(as.Date(xlabels,
+                                                origin = "1970-01-01"),
+                                        date_format),
        cex.axis = xaxlabsz)
   axis(2, at = ylabels, labels = ylabels,
        cex.axis = yaxlabsz)

@@ -145,20 +145,25 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
     # Also do the date matching procedure (as in .fill_diff_df_staggered)
     # for consistent trends_data
-    end_date <- seq.Date(as.Date(diff_df$end_time[1]), length.out = 2,
+    end_date <- seq.Date(as.Date(diff_df$end_time[1],
+                                 origin  = "1970-01-01"), length.out = 2,
                          by = diff_df$freq[1])[2]
-    empty_diff_times <- seq.Date(as.Date(diff_df$start_time[1]),
-                                 as.Date(end_date),
+    empty_diff_times <- seq.Date(as.Date(diff_df$start_time[1],
+                                         origin = "1970-01-01"),
+                                 as.Date(end_date, origin = "1970-01-01"),
                                  by = diff_df$freq[1])
     silo_diff_times <- unique(silo_df$time)
     missing_times <- c(setdiff(silo_diff_times, empty_diff_times),
                        setdiff(empty_diff_times, silo_diff_times))
     if (length(missing_times > 0)) {
       freq <- diff_df$freq[1]
-      date_dict <- .match_dates(as.Date(empty_diff_times),
-                                as.Date(silo_diff_times), freq)
+      date_dict <- .match_dates(as.Date(empty_diff_times,
+                                        origin = "1970-01-01"),
+                                as.Date(silo_diff_times,
+                                        origin = "1970-01-01"), freq)
       silo_df$time <- as.Date(sapply(silo_df$time,
-                                     function(x) date_dict[[as.character(x)]]))
+                                     function(x) date_dict[[as.character(x)]]),
+                              origin = "1970-01-01")
     }
     # Indicate treatment time for trends_data
     if (as.character(as.integer(diff_df$treat[1])) == "1") {
@@ -205,8 +210,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 # Matches silo dates to the most recently passed dates in empty_diff
 .match_dates <- function(empty_diff_dates, silo_dates, freq) {
 
-  backward_dates <- as.Date(character())
-  forward_dates <- as.Date(character())
+  backward_dates <- as.Date(character(), origin = "1970-01-01")
+  forward_dates <- as.Date(character(), origin = "1970-01-01")
 
   min_diff_date <- min(empty_diff_dates)
   max_diff_date <- max(empty_diff_dates)
@@ -256,14 +261,16 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
                      setdiff(empty_diff_times, silo_diff_times))
   if (length(missing_times > 0)) {
     freq <- diff_df$freq[1]
-    date_dict <- .match_dates(as.Date(empty_diff_times),
-                              as.Date(silo_diff_times), freq)
+    date_dict <- .match_dates(as.Date(empty_diff_times, origin = "1970-01-01"),
+                              as.Date(silo_diff_times,
+                                      origin = "1970-01-01"), freq)
     silo_df$time <- as.Date(sapply(silo_df$time,
-                                   function(x) date_dict[[as.character(x)]]))
+                                   function(x) date_dict[[as.character(x)]]),
+                            origin = "1970-01-01")
   }
 
   # Fill the staggered diff_df
-  pre_periods <- as.Date(unique(diff_df$diff_times_pre))
+  pre_periods <- as.Date(unique(diff_df$diff_times_pre), origin = "1970-01-01")
   missing_dates <- c()
   for (pre in pre_periods) {
     post_periods <- unique(diff_df[diff_df$diff_times_pre == pre,
@@ -305,7 +312,7 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   }
   .warn_missing_dates(missing_dates)
 
-  diff_df$gvar <- as.Date(diff_df$gvar)
+  diff_df$gvar <- as.Date(diff_df$gvar, origin = "1970-01-01")
   diff_df$gvar <- .parse_date_to_string(diff_df$gvar,
                                         diff_df$date_format[1])
   diff_df <- diff_df[, !(names(diff_df) %in%
@@ -332,7 +339,9 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 .warn_missing_dates <- function(missing_dates) {
   if (length(missing_dates) > 0) {
     warning(paste("No obs found for:",
-                  paste(sort(unique(as.Date(missing_dates))), collapse = ", ")))
+                  paste(sort(unique(as.Date(missing_dates,
+                                            origin = "1970-01-01"))),
+                        collapse = ", ")))
   }
 }
 
@@ -376,10 +385,10 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   }
 
   diff_df$common_treatment_time <- .parse_date_to_string(
-    as.Date(diff_df$common_treatment_time), date_format
+    as.Date(diff_df$common_treatment_time, origin = "1970-01-01"), date_format
   )
-  diff_df$start_time <- as.Date(diff_df$start_time)
-  diff_df$end_time <- as.Date(diff_df$end_time)
+  diff_df$start_time <- as.Date(diff_df$start_time, origin = "1970-01-01")
+  diff_df$end_time <- as.Date(diff_df$end_time, origin = "1970-01-01")
   return(diff_df)
 }
 
@@ -387,8 +396,10 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 # Fill trends_data
 .fill_trends_data <- function(silo_df, diff_df, covariates, silo_name,
                               treatment_time) {
-  silo_times <- seq.Date(from = as.Date(diff_df$start_time[1]),
-                         to = as.Date(diff_df$end_time[1]),
+  silo_times <- seq.Date(from = as.Date(diff_df$start_time[1],
+                                        origin = "1970-01-01"),
+                         to = as.Date(diff_df$end_time[1],
+                                      origin = "1970-01-01"),
                          by = diff_df$freq[1])
   ntimes <- length(silo_times)
   headers <- c("silo_name", "treatment_time", "time", "mean_outcome",
@@ -397,7 +408,7 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   colnames(trends_data) <- headers
   trends_data$silo_name <- rep(silo_name, ntimes)
   trends_data$treatment_time <- rep(treatment_time, ntimes)
-  trends_data$time <- as.Date(silo_times)
+  trends_data$time <- as.Date(silo_times, origin = "1970-01-01")
   trends_data$covariates <- rep(paste(covariates, collapse = ";"), ntimes)
   trends_data$date_format <- rep(diff_df$date_format[1], ntimes)
   trends_data$freq <- rep(diff_df$freq[1], ntimes)

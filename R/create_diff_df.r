@@ -67,11 +67,17 @@ create_diff_df <- function(init_filepath, date_format, freq, covariates = FALSE,
   # Convert start_time and end_time columns to date objects
   init_df$start_time <- as.Date(vapply(init_df$start_time,
                                        .parse_string_to_date,
-                                       FUN.VALUE = as.Date(NA),
-                                       date_format = date_format))
+                                       FUN.VALUE = as.Date(
+                                         NA, origin = "1970-01-01"
+                                       ),
+                                       date_format = date_format),
+  origin = "1970-01-01")
   init_df$end_time <- as.Date(vapply(init_df$end_time, .parse_string_to_date,
-                                     FUN.VALUE = as.Date(NA),
-                                     date_format = date_format))
+                                     FUN.VALUE = as.Date(
+                                       NA, origin = "1970-01-01"
+                                     ),
+                                     date_format = date_format),
+  origin = "1970-01-01")
 
   # Ensure that start times < treat times < end times
   .start_treat_end_time_check(init_df, date_format)
@@ -179,8 +185,8 @@ create_diff_df <- function(init_filepath, date_format, freq, covariates = FALSE,
                         common_treatment_time = common_treatment_time,
                         start_time = start_time, end_time = end_time,
                         weights = weights)
-  diff_df$start_time <- as.Date(diff_df$start_time)
-  diff_df$end_time <- as.Date(diff_df$end_time)
+  diff_df$start_time <- as.Date(diff_df$start_time, origin = "1970-01-01")
+  diff_df$end_time <- as.Date(diff_df$end_time, origin = "1970-01-01")
   return(diff_df)
 }
 
@@ -195,16 +201,22 @@ create_diff_df <- function(init_filepath, date_format, freq, covariates = FALSE,
     } else if (x == "control") {
       return(NA)
     }
-  }, FUN.VALUE = as.Date(NA))
-  all_treatment_times <- sort(as.Date(na.omit(init_df$treatment_time_date)))
+  }, FUN.VALUE = as.Date(NA, origin = "1970-01-01"))
+  all_treatment_times <- sort(as.Date(na.omit(init_df$treatment_time_date),
+                                      origin = "1970-01-01"))
 
   # Grab start and end times
   start <- init_df$start_time[1]
   end <- init_df$end_time[1]
   gt_control <- do.call(rbind,
                         lapply(all_treatment_times, function(treatment_time) {
-                          times <- seq.Date(from = as.Date(treatment_time),
-                                            to = end, by = freq_string)
+                          times <- seq.Date(
+                            from = as.Date(
+                              treatment_time,
+                              origin = "1970-01-01"
+                            ),
+                            to = end, by = freq_string
+                          )
                           data.frame(g = treatment_time, t = times)
                         }))
   gt_control <- unique(gt_control)
@@ -226,9 +238,10 @@ create_diff_df <- function(init_filepath, date_format, freq, covariates = FALSE,
       treat <- "1"
     } else if (treatment_time == "control") {
       gt <- gt_control
-      diff_times <- data.frame(post = as.Date(NULL), pre = as.Date(NULL))
+      diff_times <- data.frame(post = NULL,
+                               pre = NULL)
       for (g in unique(gt$g)) {
-        g <- as.Date(g)
+        g <- as.Date(g, origin = "1970-01-01")
         post_periods <- seq(from = g, to = end, by = freq_string)
         pre_period <- seq(g, length = 2,
                           by = paste0("-", freq_string))[2]

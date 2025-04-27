@@ -177,7 +177,7 @@ undid_stage_three <- function(dir_path, agg = "silo", weights = TRUE,
       non_missing_count <- nrow(diff_df[mask & !is.na(diff_df[[value]]), ])
       if (non_missing_count < 1) {
         stop(paste0("No other values of ", value, " found for (silo, gvar) = (",
-                    silo, ", ", as.Date(gvar), ")",
+                    silo, ", ", as.Date(gvar, origin = "1970-01-01"), ")",
                     ".\nNot able to impute missing values."))
       } else if (non_missing_count == 1) {
         non_missing_value <- diff_df[mask &
@@ -314,7 +314,7 @@ undid_stage_three <- function(dir_path, agg = "silo", weights = TRUE,
   results$agg_ATT_jknife_p_val[1] <- 2 *
     (1 - pt(abs(reg$beta_hat[1] / results$agg_ATT_jknife_SE[1]), n - 2))
 
-  results$gvar <- as.Date(results$gvar)
+  results$gvar <- as.Date(results$gvar, origin = "1970-01-01")
 
   # Now do randomization inference
   results$agg_ATT_RI_p_val[1] <- .compute_ri_pval(diff_df, "g", nperm,
@@ -432,7 +432,8 @@ undid_stage_three <- function(dir_path, agg = "silo", weights = TRUE,
 
     # Grabs gvars in the same order as the silos they are assigned to
     new_gvars <- as.Date(init[[paste0("gvar_randomized_",
-                                      toString(j))]])[!mask_gvar]
+                                      toString(j))]],
+                         origin = "1970-01-01")[!mask_gvar]
 
     # Selects the treated and control silos for this iteration
     new_treated_silos <- init$silo_name[!mask_gvar]

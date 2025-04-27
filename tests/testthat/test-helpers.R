@@ -29,13 +29,17 @@ test_that("start_time < treat_time < end_time is enforced with errors",
                           stringsAsFactors = FALSE)
     init_df$treatment_time <- tolower(init_df$treatment_time)
     expect_null(.init_checks(init_df))
-    init_df$start_time <- as.Date(vapply(init_df$start_time,
-                                         .parse_string_to_date,
-                                         FUN.VALUE = as.Date(NA),
-                                         date_format = "yyyy"))
-    init_df$end_time <- as.Date(vapply(init_df$end_time, .parse_string_to_date,
-                                       FUN.VALUE = as.Date(NA),
-                                       date_format = "yyyy"))
+    init_df$start_time <- as.Date(vapply(
+      init_df$start_time,
+      .parse_string_to_date,
+      FUN.VALUE = as.Date(NA, origin = "1970-01-01"),
+      date_format = "yyyy"
+    ), origin = "1970-01-01")
+    init_df$end_time <- as.Date(vapply(
+      init_df$end_time, .parse_string_to_date,
+      FUN.VALUE = as.Date(NA, origin = "1970-01-01"),
+      date_format = "yyyy"
+    ), origin = "1970-01-01")
     expect_error(.start_treat_end_time_check(init_df, "yyyy"))
 
     # Check that start_time > end_time throws error

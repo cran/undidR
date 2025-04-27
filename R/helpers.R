@@ -244,7 +244,8 @@
   treated_rows$treatment_time <- as.Date(vapply(treated_rows$treatment_time,
                                                 .parse_string_to_date,
                                                 FUN.VALUE = as.Date(NA),
-                                                date_format = date_format))
+                                                date_format = date_format),
+                                         origin = "1970-01-01")
   invalid_rows <- treated_rows[
     treated_rows$start_time >= treated_rows$treatment_time,
   ]
@@ -302,6 +303,16 @@
   }
 
   diff_df$treat <- as.integer(diff_df$treat)
+  diff_df$start_time <- mapply(
+    .parse_string_to_date,
+    as.character(diff_df$start_time),
+    "yyyy-mm-dd"
+  )
+  diff_df$end_time <- mapply(
+    .parse_string_to_date,
+    as.character(diff_df$end_time),
+    "yyyy-mm-dd"
+  )
 
   if (all(.undid_env$staggered_columns %in% names(diff_df))) {
     diff_df$gvar <- mapply(
@@ -332,16 +343,6 @@
       .parse_string_to_date,
       as.character(diff_df$common_treatment_time),
       diff_df$date_format
-    )
-    diff_df$start_time <- mapply(
-      .parse_string_to_date,
-      as.character(diff_df$start_time),
-      "yyyy-mm-dd"
-    )
-    diff_df$end_time <- mapply(
-      .parse_string_to_date,
-      as.character(diff_df$end_time),
-      "yyyy-mm-dd"
     )
   } else {
     stop(paste("diff_df does not match any expected structure.",
