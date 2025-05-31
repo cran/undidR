@@ -393,7 +393,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
     ylabels <- seq(from = yrange[1], to = yrange[2], length.out = yticks)
     ylabels <- round(ylabels, ydecimal)
   }
-  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
+  #trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   plot(trends_data$time, trends_data$y, type = "n", xlab = xlab, ylab = ylab,
        main = title, ylim = ylim, xaxt = "n",
        yaxt = "n")
@@ -491,7 +491,7 @@ plot_parallel_trends <- function(dir_path, covariates = FALSE, save_csv = FALSE,
     ylim <- range(trends_data$y, na.rm = TRUE)
   }
   # Initiate plot
-  trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
+  #trends_data$time <- as.Date(trends_data$time, origin = "1970-01-01")
   plot(trends_data$time, trends_data$y, type = "n", xlab = xlab, ylab = ylab,
        main = title, ylim = ylim, xaxt = "n",
        yaxt = "n")

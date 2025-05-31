@@ -177,6 +177,15 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   trends_data <- .fill_trends_data(silo_df, diff_df, covariates,
                                    silo_name, treatment_time)
   # Save as csv, print filepath, return dataframe
+  date_format <- diff_df$date_format[1]
+  diff_df$start_time <- .parse_date_to_string(
+                                              as.Date(diff_df$start_time,
+                                                      origin = "1970-01-01"),
+                                              date_format)
+  diff_df$end_time <- .parse_date_to_string(
+                                            as.Date(diff_df$end_time,
+                                                    origin = "1970-01-01"),
+                                            date_format)
   full_path_diff <- file.path(filepath, diff_filename)
   full_path_trends <- file.path(filepath, trends_filename)
   write.csv(diff_df, full_path_diff, row.names = FALSE, quote = FALSE,

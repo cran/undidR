@@ -292,6 +292,7 @@
   diff_df <- read.csv(diff_df_filepath, header = TRUE, sep = ",",
                       stringsAsFactors = FALSE)
   diff_df$silo_name <- as.character(diff_df$silo_name)
+  date_format <- diff_df$date_format[1]
 
   if (stage == 2) {
     if (!silo_name %in% unique(diff_df$silo_name)) {
@@ -306,12 +307,12 @@
   diff_df$start_time <- mapply(
     .parse_string_to_date,
     as.character(diff_df$start_time),
-    "yyyy-mm-dd"
+    date_format
   )
   diff_df$end_time <- mapply(
     .parse_string_to_date,
     as.character(diff_df$end_time),
-    "yyyy-mm-dd"
+    date_format
   )
 
   if (all(.undid_env$staggered_columns %in% names(diff_df))) {
