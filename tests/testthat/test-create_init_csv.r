@@ -1,20 +1,3 @@
-test_that("non character arguments result in error",
-  {
-    expect_error(create_init_csv(silo_names = c(71, 73),
-                                 start_times = c("1989", "1989"),
-                                 end_times = c("2000", "2000"),
-                                 treatment_times = c("1991", "control")))
-    expect_error(create_init_csv(silo_names = c("71", "73"),
-                                 start_times = c(1989, 1989),
-                                 end_times = c("2000", "2000"),
-                                 treatment_times = c("1991", "control")))
-    expect_error(create_init_csv(silo_names = c("71", "73"),
-                                 start_times = c("1989", "1989"),
-                                 end_times = c(2000, 2000),
-                                 treatment_times = c("1991", "control")))
-  }
-)
-
 test_that("whitespace is removed",
   {
     expect_equal(create_init_csv(

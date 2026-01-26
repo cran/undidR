@@ -1,0 +1,35 @@
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Article",
+         title = "Difference-in-Differences with Unpoolable Data",
+         author = c(person("Sunny", "Karim"),
+                    person("Matthew D.", "Webb"),
+                    person("Nichole", "Austin"),
+                    person("Erin", "Strumpf")),
+         year = "2024",
+         journal = "arXiv preprint arXiv:2403.15910",
+         url = "https://arxiv.org/abs/2403.15910",
+         header = "To cite the UN-DID paper, please use:\n"
+)
+
+bibentry(bibtype = "Article",
+         title = "Randomization inference for difference-in-differences with few treated clusters",
+         author = c(person("James G.", "MacKinnon"),
+                    person("Matthew D.", "Webb")),
+         year = "2020",
+         journal = "Journal of Econometrics",
+         volume = "218",
+         number = "2",
+         pages = "435-450",
+         url = "https://doi.org/10.1016/j.jeconom.2020.04.024",
+         header = "If you are using randomization inference p-values, please also cite:\n"
+)
+
+bibentry(bibtype = "Misc",
+         title = "undidR: Difference-in-Differences with Unpoolable Data",
+         author = person("Eric", "Jamieson"),
+         year = "2025",
+         note = note,
+         url = "https://doi.org/10.32614/CRAN.package.undidR",
+         header = "To cite the undidR software package:\n"
+)

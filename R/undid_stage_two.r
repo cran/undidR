@@ -27,6 +27,13 @@
 #'  Defaults to `TRUE`.
 #' @param filepath Character value indicating the filepath to
 #'  save the CSV files. Defaults to `tempdir()`.
+#' @param anonymize_weights A logical value (defaults `FALSE`) which
+#'  determines if the counts of n (# of obs. used to calculate a
+#'  contrast/difference) and n_t (# of treated obs. used in the
+#'  calculation of a contrast/difference) should be rounded.
+#' @param anonymize_size A numeric value. Counts will be rounded to the nearest
+#'  multiple of this value if `anonymize_weights` is `TRUE` (with a minimum
+#'  value for any count being set as the value given for `anonymize_size`).
 #'
 #' @returns A list of data frames. The first being the filled differences
 #' data frame, and the second being the trends data data frame. Use
@@ -56,10 +63,24 @@
 #' # Clean up temporary files
 #' unlink(file.path(tempdir(), c("diff_df_71.csv",
 #'                              "trends_data_71.csv")))
+#' @importFrom stats complete.cases na.omit
 #' @export
 undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
-                            time_column, outcome_column, silo_date_format,
-                            consider_covariates = TRUE, filepath = tempdir()) {
+                            time_column, outcome_column,
+                            silo_date_format = NULL,
+                            consider_covariates = TRUE, filepath = tempdir(),
+                            anonymize_weights = FALSE, anonymize_size = 5) {
+
+  # Check anon args
+  .validate_logical_args(anonymize_weights, "anonymize_weights")
+  if (!is.numeric(anonymize_size)) {
+    stop("'anonymize_size' must be numeric.")
+  } else {
+    anonymize_size <- round(anonymize_size)
+    if (anonymize_size < 1) {
+      stop("'anonymize_size' must be greater than or equal to 1.")
+    }
+  }
 
   # Run filepaths and filename checks
   silo_name <- as.character(silo_name)
@@ -75,6 +96,22 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
   .time_and_outcome_check(silo_df, time_column, outcome_column)
   colnames(silo_df)[colnames(silo_df) == time_column] <- "time"
   colnames(silo_df)[colnames(silo_df) == outcome_column] <- "outcome"
+
+  # Allow for time column to be numeric but only if it is 4 digits
+  if (is.numeric(silo_df$time)) {
+    silo_df$time <- as.character(silo_df$time)
+    if (!all(grepl("^[0-9]{4}$", silo_df$time))) {
+      stop(paste(time_column,
+                 "must be numeric with 4 digits if not a character value."))
+    }
+    silo_date_format <- "yyyy"
+  } else if (is.null(silo_df$time)) {
+    stop(paste(
+      "'silo_date_format' must be specified unless the time column is numeric",
+      "and each value is 4 digits long."
+    ))
+  }
+
   if (!all(!is.na(suppressWarnings(as.numeric(silo_df$outcome))))) {
     stop("Ensure every value in the outcome column is a numeric value.")
   }
@@ -133,7 +170,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
   # Fill staggered adoption diff_df
   if ("diff_times" %in% names(diff_df)) {
-    diff_df <- .fill_diff_df_staggered(silo_df, diff_df, covariates)
+    diff_df <- .fill_diff_df_staggered(silo_df, diff_df, covariates,
+                                       anonymize_size, anonymize_weights)
     if (as.character(as.integer(diff_df[diff_df$RI == 0, "treat"][1])) == "1") {
       treatment_time <- diff_df[diff_df$RI == 0, "gvar"][1]
     } else {
@@ -141,7 +179,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
     }
     # Or fill common adoption diff_df
   } else if ("common_treatment_time" %in% names(diff_df)) {
-    diff_df <- .fill_diff_df_common(silo_df, diff_df, covariates)
+    diff_df <- .fill_diff_df_common(silo_df, diff_df, covariates,
+                                    anonymize_size, anonymize_weights)
 
     # Also do the date matching procedure (as in .fill_diff_df_staggered)
     # for consistent trends_data
@@ -172,10 +211,14 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
       treatment_time <- "control"
     }
   }
+  if (anonymize_weights) {
+    diff_df$anonymize_size <- anonymize_size
+  }
 
   # Fill trends_data
   trends_data <- .fill_trends_data(silo_df, diff_df, covariates,
-                                   silo_name, treatment_time)
+                                   silo_name, treatment_time, anonymize_size,
+                                   anonymize_weights)
   # Save as csv, print filepath, return dataframe
   date_format <- diff_df$date_format[1]
   diff_df$start_time <- .parse_date_to_string(
@@ -261,7 +304,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
 #' @keywords internal
 # Fill the empty_diff_df for staggered adoption during stage two
-.fill_diff_df_staggered <- function(silo_df, diff_df, covariates) {
+.fill_diff_df_staggered <- function(silo_df, diff_df, covariates,
+                                    anonymize_size, anonymize_weights) {
 
   # Do date matching procedure if necessary
   empty_diff_times <- unique(c(diff_df$diff_times_post, diff_df$diff_times_pre))
@@ -278,6 +322,9 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
                             origin = "1970-01-01")
   }
 
+  # Check weighting type
+  weights <- diff_df$weights[1]
+
   # Fill the staggered diff_df
   pre_periods <- as.Date(unique(diff_df$diff_times_pre), origin = "1970-01-01")
   missing_dates <- c()
@@ -293,30 +340,52 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
       # Keep track of dates with no obs
       if (count_pre == 0 || count_post == 0) {
+        # Values are already populated with NA, so if there isn't
+        # a computation to be done for a pre & post pair, we can just skip it
         missing_dates <- .track_missing_dates(missing_dates, count_pre,
                                               count_post, pre, post)
       } else {
-        x <- cbind(rep(1, length(x)), x)
+        x <- cbind(1, x)
         y <- as.numeric(silo_df[time_filter, ]$outcome)
         reg <- .regress(x, y)
         diff_df[(diff_df$diff_times_pre == pre) &
                   (diff_df$diff_times_post == post),
-                "diff_estimate"] <- reg$beta_hat[2]
+                "diff_estimate"] <- reg$beta_hat
         diff_df[(diff_df$diff_times_pre == pre) &
                   (diff_df$diff_times_post == post),
-                "diff_var"] <- reg$beta_hat_var[2]
+                "diff_var"] <- (reg$beta_hat_se)^2
         if (!identical(covariates, "none")) {
           x <- as.matrix(cbind(x, silo_df[time_filter, covariates]))
+          x <- .ensure_full_rank(x)
           reg <- .regress(x, y)
           diff_df[(diff_df$diff_times_pre == pre) &
                     (diff_df$diff_times_post == post),
-                  "diff_estimate_covariates"] <- reg$beta_hat[2]
+                  "diff_estimate_covariates"] <- reg$beta_hat
           diff_df[(diff_df$diff_times_pre == pre) &
                     (diff_df$diff_times_post == post),
-                  "diff_var_covariates"] <- reg$beta_hat_var[2]
+                  "diff_var_covariates"] <- (reg$beta_hat_se)^2
+        }
+        if (weights %in% c("diff", "both")) {
+          w <- count_post + count_pre
+          if (anonymize_weights == TRUE) {
+            w <- max(c(anonymize_size,
+                       anonymize_size * round(w / anonymize_size)))
+          }
+          diff_df[(diff_df$diff_times_pre == pre) &
+                    (diff_df$diff_times_post == post),
+                  "n"] <- w
+        }
+        if (weights %in% c("att", "both")) {
+          w <- count_post
+          if (anonymize_weights == TRUE) {
+            w <- max(c(anonymize_size,
+                       anonymize_size * round(w / anonymize_size)))
+          }
+          diff_df[(diff_df$diff_times_pre == pre) &
+                    (diff_df$diff_times_post == post),
+                  "n_t"] <- w
         }
       }
-
     }
   }
   .warn_missing_dates(missing_dates)
@@ -356,7 +425,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 
 #' @keywords internal
 # Fill the empty_diff_df for common adoption during stage two
-.fill_diff_df_common <- function(silo_df, diff_df, covariates) {
+.fill_diff_df_common <- function(silo_df, diff_df, covariates,
+                                 anonymize_size, anonymize_weights) {
 
   treatment_time <- diff_df$common_treatment_time[1]
   start_time <- diff_df$start_time[1]
@@ -379,18 +449,32 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
                "\nNeed at least one obs on both sides of treatment."))
   }
 
-  if (weights == "standard") {
-    diff_df$weights[1] <- (count_post) / (count_pre + count_post)
+  if (weights %in% c("diff", "both")) {
+    w <- count_pre + count_post
+    if (anonymize_weights == TRUE) {
+      w <- max(c(anonymize_size,
+                 anonymize_size * round(w / anonymize_size)))
+    }
+    diff_df$n[1] <- w
+  }
+  if (weights %in% c("att", "both")) {
+    w <- count_post
+    if (anonymize_weights == TRUE) {
+      w <- max(c(anonymize_size,
+                 anonymize_size * round(w / anonymize_size)))
+    }
+    diff_df$n_t[1] <- w
   }
 
   reg <- .regress(x, y)
-  diff_df$diff_estimate[1] <- reg$beta_hat[2]
-  diff_df$diff_var[1] <- reg$beta_hat_var[2]
+  diff_df$diff_estimate[1] <- reg$beta_hat
+  diff_df$diff_var[1] <- (reg$beta_hat_se)^2
   if (!identical(covariates, "none")) {
     x <- as.matrix(cbind(x, silo_df[, covariates]))
+    x <- .ensure_full_rank(x)
     reg <- .regress(x, y)
-    diff_df$diff_estimate_covariates[1] <- reg$beta_hat[2]
-    diff_df$diff_var_covariates[1] <- reg$beta_hat_var[2]
+    diff_df$diff_estimate_covariates[1] <- reg$beta_hat
+    diff_df$diff_var_covariates[1] <- (reg$beta_hat_se)^2
   }
 
   diff_df$common_treatment_time <- .parse_date_to_string(
@@ -404,7 +488,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
 #' @keywords internal
 # Fill trends_data
 .fill_trends_data <- function(silo_df, diff_df, covariates, silo_name,
-                              treatment_time) {
+                              treatment_time, anonymize_size,
+                              anonymize_weights) {
   silo_times <- seq.Date(from = as.Date(diff_df$start_time[1],
                                         origin = "1970-01-01"),
                          to = as.Date(diff_df$end_time[1],
@@ -412,7 +497,8 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
                          by = diff_df$freq[1])
   ntimes <- length(silo_times)
   headers <- c("silo_name", "treatment_time", "time", "mean_outcome",
-               "mean_outcome_residualized", "covariates", "date_format", "freq")
+               "mean_outcome_residualized", "covariates", "date_format", "freq",
+               "n")
   trends_data <- data.frame(matrix(ncol = length(headers), nrow = ntimes))
   colnames(trends_data) <- headers
   trends_data$silo_name <- rep(silo_name, ntimes)
@@ -427,15 +513,27 @@ undid_stage_two <- function(empty_diff_filepath, silo_name, silo_df,
         silo_df[silo_df$time == period, ]$outcome
       )
     )
+    w <- sum(silo_df$time == period)
+    if (anonymize_weights == TRUE) {
+      w <- max(c(anonymize_size,
+                 anonymize_size * round(w / anonymize_size)))
+    }
+    trends_data[trends_data$time == period, "n"] <- w
   }
   if (!identical(covariates, "none")) {
     for (period in silo_times) {
       x <- as.matrix(silo_df[silo_df$time == period, covariates])
+      x <- .ensure_full_rank(x, protect = FALSE)
       y <- as.vector(silo_df[silo_df$time == period, ]$outcome)
-      beta_hat <- .inv(t(x) %*% x) %*% t(x) %*% y
-      resid <- y - x %*% beta_hat
+      beta_hat <- .safe_solve(x, y)
+      if (!all(is.na(beta_hat))) {
+        resid <- y - x %*% beta_hat
+        outcome_resid <- mean(resid)
+      } else {
+        outcome_resid <- NA
+      }
       trends_data[trends_data$time == period,
-                  "mean_outcome_residualized"] <- mean(resid)
+                  "mean_outcome_residualized"] <- outcome_resid
     }
   } else {
     trends_data$mean_outcome_residualized <- rep(NA_real_, ntimes)

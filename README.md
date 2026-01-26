@@ -39,7 +39,7 @@ install.packages("undidR")
 
 ## Examples
 
-For a set of highly detailed examples see the package vignette using:
+For a set of detailed examples see the package vignette using:
 
 ``` r
 vignette("undidR", package = "undidR")
@@ -59,7 +59,7 @@ init <- create_init_csv(silo_names = c("73", "46", "54", "23", "86", "32",
                         treatment_times = c(rep("control", 6),
                                             "1991", "1993", "1996", "1997",
                                             "1997", "1998"))
-#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpOSra8e/init.csv
+#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/init.csv
 init
 #>    silo_name start_time end_time treatment_time
 #> 1         73       1989     2000        control
@@ -80,23 +80,23 @@ init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
 empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
                                 freq = "yearly",
                                 covariates = c("asian", "black", "male"))
-#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpOSra8e/empty_diff_df.csv
+#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/empty_diff_df.csv
 head(empty_diff_df, 4)
-#>   silo_name gvar treat diff_times        gt RI start_time end_time
-#> 1        73 1991     0  1991;1990 1991;1991  0       1989     2000
-#> 2        73 1991     0  1992;1990 1991;1992  0       1989     2000
-#> 3        73 1991     0  1993;1990 1991;1993  0       1989     2000
-#> 4        73 1991     0  1994;1990 1991;1994  0       1989     2000
+#>   silo_name gvar treat diff_times        gt RI start_time end_time weights
+#> 1        73 1991     0  1991;1990 1991;1991  0       1989     2000    both
+#> 2        73 1991     0  1992;1990 1991;1992  0       1989     2000    both
+#> 3        73 1991     0  1993;1990 1991;1993  0       1989     2000    both
+#> 4        73 1991     0  1994;1990 1991;1994  0       1989     2000    both
 #>   diff_estimate diff_var diff_estimate_covariates diff_var_covariates
 #> 1            NA       NA                       NA                  NA
 #> 2            NA       NA                       NA                  NA
 #> 3            NA       NA                       NA                  NA
 #> 4            NA       NA                       NA                  NA
-#>         covariates date_format   freq
-#> 1 asian;black;male        yyyy 1 year
-#> 2 asian;black;male        yyyy 1 year
-#> 3 asian;black;male        yyyy 1 year
-#> 4 asian;black;male        yyyy 1 year
+#>         covariates date_format   freq  n n_t anonymize_size
+#> 1 asian;black;male        yyyy 1 year NA  NA             NA
+#> 2 asian;black;male        yyyy 1 year NA  NA             NA
+#> 3 asian;black;male        yyyy 1 year NA  NA             NA
+#> 4 asian;black;male        yyyy 1 year NA  NA             NA
 ```
 
 ### Stage Two: `undid_stage_two()`
@@ -108,68 +108,65 @@ empty_diff_filepath <- system.file("extdata/staggered", "empty_diff_df.csv",
 stage2 <- undid_stage_two(empty_diff_filepath, silo_name = "71",
                           silo_df = silo_data, time_column = "year",
                           outcome_column = "coll", silo_date_format = "yyyy")
-#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpOSra8e/filled_diff_df_71.csv
-#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpOSra8e/trends_data_71.csv
+#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/filled_diff_df_71.csv
+#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/trends_data_71.csv
 head(stage2$diff_df, 4)
-#>   silo_name gvar treat diff_times        gt RI start_time   end_time
-#> 1        71 1991     1  1991;1990 1991;1991  0 1989-01-01 2000-01-01
-#> 2        71 1991     1  1992;1990 1991;1992  0 1989-01-01 2000-01-01
-#> 3        71 1991     1  1993;1990 1991;1993  0 1989-01-01 2000-01-01
-#> 4        71 1991     1  1994;1990 1991;1994  0 1989-01-01 2000-01-01
+#>   silo_name gvar treat diff_times        gt RI start_time end_time weights
+#> 1        71 1991     1  1991;1990 1991;1991  0       1989     2000    both
+#> 2        71 1991     1  1992;1990 1991;1992  0       1989     2000    both
+#> 3        71 1991     1  1993;1990 1991;1993  0       1989     2000    both
+#> 4        71 1991     1  1994;1990 1991;1994  0       1989     2000    both
 #>   diff_estimate    diff_var diff_estimate_covariates diff_var_covariates
 #> 1    0.12916667 0.009447555              0.116348472         0.009397021
 #> 2    0.06916667 0.008602222              0.069515594         0.008272557
 #> 3    0.02546296 0.007975422              0.005133291         0.007767637
 #> 4    0.02703901 0.008564103              0.029958108         0.008338060
-#>         covariates date_format   freq
-#> 1 asian;black;male        yyyy 1 year
-#> 2 asian;black;male        yyyy 1 year
-#> 3 asian;black;male        yyyy 1 year
-#> 4 asian;black;male        yyyy 1 year
+#>         covariates date_format   freq   n n_t anonymize_size
+#> 1 asian;black;male        yyyy 1 year  93  45             NA
+#> 2 asian;black;male        yyyy 1 year  98  50             NA
+#> 3 asian;black;male        yyyy 1 year 102  54             NA
+#> 4 asian;black;male        yyyy 1 year  95  47             NA
 head(stage2$trends_data, 4)
 #>   silo_name treatment_time time mean_outcome mean_outcome_residualized
 #> 1        71           1991 1989    0.3061224                 0.1998800
 #> 2        71           1991 1990    0.2708333                 0.1502040
 #> 3        71           1991 1991    0.4000000                 0.1949109
 #> 4        71           1991 1992    0.3400000                 0.1876636
-#>         covariates date_format   freq
-#> 1 asian;black;male        yyyy 1 year
-#> 2 asian;black;male        yyyy 1 year
-#> 3 asian;black;male        yyyy 1 year
-#> 4 asian;black;male        yyyy 1 year
+#>         covariates date_format   freq  n
+#> 1 asian;black;male        yyyy 1 year 49
+#> 2 asian;black;male        yyyy 1 year 48
+#> 3 asian;black;male        yyyy 1 year 45
+#> 4 asian;black;male        yyyy 1 year 50
 ```
 
 ### Stage Three: `undid_stage_three()`
 
 ``` r
 dir_path <- system.file("extdata/staggered", package = "undidR")
-results <- undid_stage_three(dir_path, agg = "silo", covariates = TRUE,
-                             nperm = 501)
-#> Completed 100 of 500 permutations
-#> Completed 200 of 500 permutations
-#> Completed 300 of 500 permutations
-#> Completed 400 of 500 permutations
-#> Completed 500 of 500 permutations
-results
-#>   silo_name    silo_ATT    silo_SE  silo_p_val silo_jknife_SE silo_jknife_p_val
-#> 1        57 -0.08144843 0.06215099 0.205650586     0.08649845       0.358207857
-#> 2        58  0.05280529 0.02538483 0.042267963     0.02689507       0.054760168
-#> 3        59  0.12365658 0.03562132 0.001823809     0.04254611       0.007377655
-#> 4        64  0.07263498 0.03311326 0.035420278     0.03786681       0.063776333
-#> 5        71  0.04618515 0.02595757 0.079666710     0.02796956       0.103295735
-#> 6        85  0.07400401 0.03456541 0.041820821     0.04102590       0.082856564
-#>      agg_ATT agg_ATT_SE agg_ATT_p_val agg_ATT_jknife_SE agg_ATT_jknife_p_val
-#> 1 0.04797293 0.02570683     0.1210099        0.02816042            0.1636711
-#> 2         NA         NA            NA                NA                   NA
-#> 3         NA         NA            NA                NA                   NA
-#> 4         NA         NA            NA                NA                   NA
-#> 5         NA         NA            NA                NA                   NA
-#> 6         NA         NA            NA                NA                   NA
-#>   agg_ATT_RI_p_val
-#> 1             0.18
-#> 2               NA
-#> 3               NA
-#> 4               NA
-#> 5               NA
-#> 6               NA
+results <- undid_stage_three(dir_path, agg = "g", covariates = TRUE,
+                             nperm = 399, hc = "hc0", verbose = NULL)
+summary(results)
+#> 
+#>   Weighting: both
+#>   Aggregation: g
+#>   Not-yet-treated: FALSE
+#>   Covariates: asian, black, male
+#>   HCCME: hc0
+#>   Period Length: 1 year
+#>   First Period: 1989
+#>   Last Period: 2000
+#>   Permutations: 399
+#> 
+#> Aggregate Results:
+#>        ATT Std. Error    p-value RI p-value Jackknife SE Jackknife p-value
+#>  0.0727396 0.02600099 0.04893262 0.05764411   0.03619008        0.06960867
+#> 
+#> Subaggregate Results:
+#> Treatment Time              ATT         SE    p-value   RI p-val      JK SE   JK p-val     Weight
+#> -------------------------------------------------------------------------------------------------------------- 
+#> 1991                     0.0434     0.0252     0.0899     0.3459         NA         NA     0.2428
+#> 1993                     0.0478     0.0242     0.0528     0.4311         NA         NA     0.2305
+#> 1996                     0.0451     0.0353     0.2106     0.6190         NA         NA     0.0910
+#> 1997                     0.1322     0.0294     0.0001     0.0602     0.0532     0.0302     0.3863
+#> 1998                    -0.0812     0.0602     0.1937     0.3108         NA         NA     0.0494
 ```

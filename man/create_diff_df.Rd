@@ -10,7 +10,7 @@ create_diff_df(
   freq,
   covariates = FALSE,
   freq_multiplier = FALSE,
-  weights = "standard",
+  weights = "both",
   filename = "empty_diff_df.csv",
   filepath = tempdir()
 )
@@ -31,10 +31,14 @@ at each silo. If \code{FALSE} (default) uses covariates from the \code{init.csv}
 \item{freq_multiplier}{A numeric value or \code{FALSE} (default).
 Specify if the frequency should be multiplied by a non-zero integer.}
 
-\item{weights}{A character indicating the weighting to use in the case of
-common adoption. The \code{"standard"} (default) weight is calculated as
-\eqn{w_s = \frac{N_s^{\text{post}}}{N_s^{\text{post}} + N_s^{\text{pre}}}}.
-Options are: \code{"standard"}.}
+\item{weights}{A character indicating the weighting to use. The options are
+\code{"none"}, \code{"diff"}, \code{"att"}, and \code{"both"}. The options reflect the levels at
+which weights are applied. \code{"diff"} uses weights based off of the number
+of observations (treated and untreated) when calculating the subaggregate
+ATTs. \code{"att"} uses weights based off of the number of treated observations
+associated with each subaggregate ATT when calculating the aggregate ATT.
+\code{"both"} applies weighting at both levels, and \code{"none"} does not use
+weights at all. Defaults to \code{"both"}.}
 
 \item{filename}{A character filename for the created CSV file. Defaults to
 \code{"empty_diff_df.csv"}}

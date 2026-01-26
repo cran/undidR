@@ -10,9 +10,11 @@ undid_stage_two(
   silo_df,
   time_column,
   outcome_column,
-  silo_date_format,
+  silo_date_format = NULL,
   consider_covariates = TRUE,
-  filepath = tempdir()
+  filepath = tempdir(),
+  anonymize_weights = FALSE,
+  anonymize_size = 5
 )
 }
 \arguments{
@@ -42,6 +44,15 @@ Defaults to \code{TRUE}.}
 
 \item{filepath}{Character value indicating the filepath to
 save the CSV files. Defaults to \code{tempdir()}.}
+
+\item{anonymize_weights}{A logical value (defaults \code{FALSE}) which
+determines if the counts of n (# of obs. used to calculate a
+contrast/difference) and n_t (# of treated obs. used in the
+calculation of a contrast/difference) should be rounded.}
+
+\item{anonymize_size}{A numeric value. Counts will be rounded to the nearest
+multiple of this value if \code{anonymize_weights} is \code{TRUE} (with a minimum
+value for any count being set as the value given for \code{anonymize_size}).}
 }
 \value{
 A list of data frames. The first being the filled differences

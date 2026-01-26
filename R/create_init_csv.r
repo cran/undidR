@@ -47,6 +47,21 @@ create_init_csv <- function(silo_names = character(), start_times = character(),
   # FALSE, or whitespace
   covariates <- .init_covariates_check(covariates)
 
+  # Force start_times, end_times, and treatment_times to character
+  # if they aren't already
+  args <- list(start_times = start_times, end_times = end_times)
+  for (arg_name in names(args)) {
+    if (!is.character(args[[arg_name]])) {
+      args[[arg_name]] <- as.character(args[[arg_name]])
+      if (!all(grepl("^[0-9]{4}$", args[[arg_name]]))) {
+        stop(paste(sQuote(arg_name),
+                   "must be numeric with 4 digits if not a character value."))
+      }
+    }
+  }
+  start_times <- args$start_times
+  end_times <- args$end_times
+
   # Check if each argument is of type 'character'
   args <- list(silo_names = silo_names, start_times = start_times,
                end_times = end_times, treatment_times = treatment_times,

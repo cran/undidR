@@ -6,15 +6,17 @@
 \usage{
 undid_stage_three(
   dir_path,
-  agg = "silo",
-  weights = TRUE,
+  agg = "g",
+  weights = "both",
   covariates = FALSE,
-  interpolation = FALSE,
-  save_csv = FALSE,
-  filename = "UNDID_results.csv",
-  filepath = tempdir(),
-  nperm = 1001,
-  verbose = TRUE
+  notyet = FALSE,
+  nperm = 999,
+  verbose = 100,
+  check_anon_size = FALSE,
+  hc = "hc3",
+  only = NULL,
+  omit = NULL,
+  max_attempts = 100
 )
 }
 \arguments{
@@ -23,65 +25,67 @@ all of the filled diff df CSV files.}
 
 \item{agg}{A character which specifies the aggregation methodology for
 computing the aggregate ATT in the case of staggered adoption.
-Options are: \code{"silo"}, \code{"g"}, or \code{"gt"}. Defaults to \code{"silo"}.}
+Options are: \code{"silo"}, \code{"g"}, \code{"gt"}, \code{"sgt"}, \code{"time"}, \code{"none"}.
+Defaults to \code{"g"}. \code{"silo"} computes a subaggregate ATT for each silo,
+\code{"g"} computes a subaggregate ATT for each unique treatment time,
+\code{"gt"} computes a subaggregate ATT for each unique treatment time
+& post-treatment period pair, \code{"sgt"} computes a subaggregate ATT
+for each treatment time & post-treatment pair, separated by silo, \code{"time"}
+computes subaggregate ATTs for grouped by time since treatment, and \code{"none"}
+does not compute any subaggregate ATTs, but rather computes an aggregate ATT
+directly from the differences.}
 
-\item{weights}{A logical value (either \code{TRUE} or \code{FALSE}) which determines
-whether or not the weights should be used in the case of common adoption.
-Defaults to \code{TRUE}.}
+\item{weights}{A string, determines which of the weighting methodologies
+should be used. Options are: \code{"none"}, \code{"diff"}, \code{"att"}, or \code{"both"}.
+Defaults to the weighting choice specified in the filled diff CSV files.}
 
 \item{covariates}{A logical value (either \code{TRUE} or \code{FALSE}) which specifies
 whether to use the \code{diff_estimate} column or the \code{diff_estimate_covariates}
 column from the filled diff df CSV files when computing ATTs.}
 
-\item{interpolation}{A logical value or a character which specifies which,
-if any, method of interpolation/extrapolation for missing values of
-\code{diff_estimate} or \code{diff_estimate_covariates} should be used.
-There must be at least one \code{diff_estimate} or \code{diff_estimate_covariates}
-value for the (silo,g) group for which a missing value is being estimated
-in order for interpolation to work. Options are: \code{"linear_function"},
-\code{"nearest_value"}, or \code{"piecewise_linear"}. Defaults to \code{FALSE}.}
+\item{notyet}{A logical value which declares if the not-yet-treated
+differences from treated silos should be used as controls when computing
+relevant sub-aggregate ATTs. Defaults to \code{FALSE}.}
 
-\item{save_csv}{A logical value, either \code{TRUE} or \code{FALSE} (default),
-which determines if a CSV copy of the UNDID results will be saved or not.}
+\item{nperm}{Number of random permutations of treatment assignment to use
+when calculating the randomization inference p-value. Defaults to \code{999}.}
 
-\item{filename}{A string filename for the created CSV file.
-Defaults to \code{"UNDID_results.csv"}}
+\item{verbose}{A numeric value (or \code{NULL}) which toggles messages showing
+the progress of the randomization inference once every \code{verbose} iterations.
+Defaults to \code{100}.}
 
-\item{filepath}{Filepath to save the CSV file. Defaults to \code{tempdir()}.}
+\item{check_anon_size}{A logical value, which if \code{TRUE} displays which
+silos enabled the \code{anonymize_weights} argument in stage two, and their
+respective \code{anonymize_size} values. Defaults to \code{FALSE}.}
 
-\item{nperm}{Number of random permutations of gvar & silo pairs to consider
-when calculating the randomization inference p-value. Defaults to \code{1001}.}
+\item{hc}{Specify which heteroskedasticity-consistent covariance matrix
+estimator (HCCME) should be used. Options are \code{0}, \code{1}, \code{2}, \code{3}, and
+\code{4} (or \code{"hc0"}, \code{"hc1"}, \code{"hc2"}, \code{"hc3"}, \code{"hc4"}).}
 
-\item{verbose}{A logical value (either \code{TRUE} or \code{FALSE}) which toggles
-messages showing the progress of the randomization inference.
-Defaults to \code{TRUE}.}
+\item{only}{A character vector of silos to include. Defaults to \code{NULL}.}
+
+\item{omit}{A character vector of silos to omit. Defaults to \code{NULL}.}
+
+\item{max_attempts}{A numeric value. Sets the maximum number of attempts
+to find a new unique random permutations during the randomization
+inference procedure. Defaults to \code{100}.}
 }
 \value{
-A data frame containing the aggregate ATT and its
-standard errors and p-values from two-sided tests of \code{agg_ATT} == 0.
-Also returns group (silo, g, or gt) level ATTs for staggered adoption.
+An UnDiDObj with S3 methods of \code{summary()}, \code{citation()},
+\code{print()}, and \code{coef()}.
 }
 \description{
 Takes in all of the filled diff df CSV files and uses them to compute
 group level ATTs as well as the aggregate ATT and its standard errors
 and p-values.
 }
-\details{
-The \code{agg} parameter specifies the aggregation method used in the
-case of staggered adoption. By default it is set to \code{"silo"} so that the ATTs
-are aggregated across silos with each silo having equal weight, but can be
-set to \code{"gt"} or \code{"g"} instead. Aggregating across \code{"g"} calculates ATTs for
-groups based on when the treatment time was, with each \code{"g"} group having
-equal weight. Aggregating across \code{"gt"} calculates ATTs for groups based on
-when the treatment time was and the time for which the ATT is calculated.
-The \code{agg} parameter is ignored in the case of a common treatment time and
-only takes effect in the case of staggered adoption. For common adoption,
-refer to the \code{weights} parameter.
-}
 \examples{
 
 # Execute `undid_stage_three()`
 dir <- system.file("extdata/staggered", package = "undidR")
-undid_stage_three(dir, agg = "g", nperm = 501, verbose = FALSE)
-
+\donttest{
+   # Recommended: nperm >= 399 for reasonable precision
+   # (~15 seconds on typical hardware)
+   undid_stage_three(dir, agg = "g", nperm = 399, verbose = NULL)
+}
 }

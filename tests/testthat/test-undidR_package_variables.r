@@ -13,5 +13,4 @@ test_that(".populate_undid_env() populates env with expected variables", {
   expect_true(exists("freq_map", envir = test_env))
   expect_true(exists("staggered_columns", envir = test_env))
   expect_true(exists("common_columns", envir = test_env))
-  expect_true(exists("interpolation_options", envir = test_env))
 })

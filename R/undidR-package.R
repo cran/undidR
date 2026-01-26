@@ -1,3 +1,35 @@
+#' undidR: Difference-in-Differences with Unpoolable Data
+#'
+#' @description
+#' Implements difference-in-differences with unpoolable data.
+#'
+#' @details
+#' A framework for estimating difference-in-differences with unpoolable data,
+#' based on Karim, Webb, Austin, and Strumpf (2025).
+#' Supports common or staggered adoption, multiple groups, and the inclusion
+#' of covariates. Also computes p-values for the aggregate average treatment
+#' effect on the treated via the randomization inference procedure described
+#' in MacKinnon and Webb (2020).
+#'
+#'
+#' @section Stage One - Initialize:
+#' \itemize{
+#'   \item \code{\link{create_init_csv}} - Create initial CSV files for setup.
+#'   \item \code{\link{create_diff_df}} - Creates the "diff matrix".
+#' }
+#'
+#' @section Stage Two - Silos:
+#' \itemize{
+#'   \item \code{\link{undid_stage_two}} - Calculates trends and differences.
+#' }
+#'
+#' @section Stage Three - Analysis:
+#' \itemize{
+#'   \item \code{\link{undid_stage_three}} - Computes ATTs and p-values.
+#' }
+#'
+#' @author Eric Jamieson
+#'
 #' @keywords internal
 "_PACKAGE"
 

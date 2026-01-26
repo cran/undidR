@@ -1,2 +1,2 @@
-silo_name,treat,common_treatment_time,start_time,end_time,weights,diff_estimate,diff_var,diff_estimate_covariates,diff_var_covariates,covariates,date_format,freq
-71,1,1991,1989,2000,0.914762741652021,0.0587978333042113,0.00259722085697801,NA,NA,none,yyyy,1 year
+silo_name,treat,common_treatment_time,start_time,end_time,weights,diff_estimate,diff_var,diff_estimate_covariates,diff_var_covariates,covariates,date_format,freq,n,n_t,anonymize_size
+71,1,1991,1989,2000,both,0.0587978333042113,0.00259722085697804,0.0669656074922092,0.00253278306039777,asian;black;male,yyyy,1 year,569,472,NA

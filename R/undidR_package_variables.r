@@ -76,22 +76,18 @@
 
   # Define expected columns for staggered adoption diff_df
   env$staggered_columns <- c("silo_name", "gvar", "treat", "diff_times",
-                             "gt", "diff_estimate", "diff_var",
-                             "diff_estimate_covariates",
-                             "diff_var_covariates", "covariates",
-                             "date_format", "freq", "RI", "start_time",
-                             "end_time")
+                             "gt", "RI", "start_time", "end_time",
+                             "weights", "diff_estimate", "diff_var",
+                             "diff_estimate_covariates", "diff_var_covariates",
+                             "covariates", "date_format", "freq",
+                             "n", "n_t", "anonymize_size")
 
   # Define expected columns for common adoption diff_df
   env$common_columns <- c("silo_name", "treat", "common_treatment_time",
                           "start_time", "end_time", "weights",
                           "diff_estimate", "diff_var",
-                          "diff_estimate_covariates",
-                          "diff_var_covariates",
-                          "covariates", "date_format", "freq")
-
-  # Define interpolation options
-  env$interpolation_options <- c("linear_function", "nearest_value",
-                                 "piecewise_linear")
+                          "diff_estimate_covariates", "diff_var_covariates",
+                          "covariates", "date_format", "freq",
+                          "n", "n_t", "anonymize_size")
 
 }

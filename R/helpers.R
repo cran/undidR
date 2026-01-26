@@ -349,37 +349,33 @@
     stop(paste("diff_df does not match any expected structure.",
                "Expected to find either:",
                "- staggered_adoption: 'silo_name', 'gvar', 'treat',",
-               "                      'diff_times', 'gt', 'diff_estimate',",
+               "                      'diff_times', 'gt', 'RI',",
+               "                      'start_time', 'end_time', 'weights',",
+               "                      'diff_estimate',",
                "                      'diff_var', 'diff_estimate_covariates',",
                "                      'diff_var_covariates', 'covariates',",
-               "                      'date_format', 'freq', 'RI'",
+               "                      'date_format', 'freq', 'n', 'n_t',",
+               "                      'anonymize_size",
                "",
                "- common_adoption: 'silo_name', 'treat',",
                "                   'common_treatment_time', 'start_time',",
                "                   'end_time', 'weights', 'diff_estimate',",
                "                   'diff_var', 'diff_estimate_covariates',",
                "                   'diff_var_covariates', 'covariates',",
-               "                   'date_format', 'freq', 'nsilos'",
+               "                   'date_format', 'freq', 'n', 'n_t',",
+               "                   'anonymize_size'",
                sep = "\n"))
   }
 
   rownames(diff_df) <- NULL
 
   # Do conversion from Julia missing to R NA if necessary
-  diff_df$diff_estimate[diff_df$diff_estimate == "missing"] <- NA_real_
-  diff_df$diff_var[diff_df$diff_var == "missing"] <- NA_real_
-  diff_df$diff_estimate_covariates[
-    diff_df$diff_estimate_covariates == "missing"
-  ] <- NA_real_
-  diff_df$diff_var_covariates[
-    diff_df$diff_var_covariates == "missing"
-  ] <- NA_real_
-  diff_df$diff_estimate <- as.numeric(diff_df$diff_estimate)
-  diff_df$diff_var <- as.numeric(diff_df$diff_var)
-  diff_df$diff_estimate_covariates <- as.numeric(
-    diff_df$diff_estimate_covariates
-  )
-  diff_df$diff_var_covariates <- as.numeric(diff_df$diff_var_covariates)
+  numeric_cols <- c("diff_estimate", "diff_var", "diff_estimate_covariates",
+                    "diff_var_covariates", "n", "n_t", "anonymize_size")
+  for (col_name in numeric_cols) {
+    diff_df[[col_name]][diff_df[[col_name]] %in% c("missing", "NA")] <- NA
+    diff_df[[col_name]] <- as.numeric(diff_df[[col_name]])
+  }
 
   return(diff_df)
 }

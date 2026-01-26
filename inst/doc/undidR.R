@@ -27,7 +27,7 @@ init
 init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
                                winslash = "/", mustWork = FALSE)
 empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
-                                freq = "yearly")
+                                freq = "yearly", weights = "both")
 empty_diff_df
 
 ## -----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ init
 init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
                                winslash = "/", mustWork = FALSE)
 empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
-                                freq = "yearly",
+                                freq = "yearly", weights = "both",
                                 covariates = c("asian", "black", "male"))
 head(empty_diff_df, 4)
 
@@ -84,70 +84,31 @@ head(stage2$trends_data, 4)
 # them together in order to compute the group level ATTs, aggregate ATT
 # and associated standard errors and p-values.
 dir_path <- system.file("extdata/common", package = "undidR")
-results <- undid_stage_three(dir_path, covariates = FALSE)
-results
+results <- undid_stage_three(dir_path, covariates = FALSE, nperm = 399)
+summary(results)
+plot(results)
 
-# We can also view a parallel trends plot of our silos by callling
-# `plot_parallel_trends()`. This function will search a folder for all
-# CSV files that start with "trends_data" and combine them. The combined
-# data is returned by the function.
-trends <- plot_parallel_trends(
-  dir_path,
-  simplify_legend = FALSE, # Setting to `FALSE` puts every silo in legend
-  lwd = 3,                 # Set line width
-  ylim = c(0, 1),          # (min, max) of y-axis
-  xdates = as.Date(c("1989-01-01",
-                     "1991-01-01",
-                     "1993-01-01", # Explicity declare dates on x-axis
-                     "1995-01-01",
-                     "1997-01-01",
-                     "1999-01-01")),
-  date_format = "%Y", # Specify x-axis date format
-  ylabels = c(0, 0.25, 0.5, 0.75, 1), # Values on y-axis
-  legend_location = "topleft", # Where should the legend go?
-  legend_on = TRUE, # Defaults `TRUE`, can be set to `FALSE` to omit legend
-  ylab = "coll", # y-axis title
-  treatment_colour = c("red", # Set colours of treatment silos
-                       "coral"),
-  control_colour = c("#2fa7cf", # Colours can be entered as hexcodes
-                     "skyblue")
-)
-head(trends, 4)
 
 ## ----fig.width=6, fig.height=4, out.width = "70%", dpi=300, fig.align="center"----
 # When calling `undid_stage_three()` for staggered adoption it is
 # important to specify the aggregation method, `agg`.
 dir_path <- system.file("extdata/staggered", package = "undidR")
 results <- undid_stage_three(dir_path, agg = "silo", covariates = TRUE,
-                             nperm = 501)
+                             nperm = 399)
+head(results$diff, 4)
 
-# The `nperm` parameter specifies how many permutations
-# to consider for randomization inference.
+head(results$trends, 4)
 
-results
+summary(results)
 
-# If we have many silos, but want to view a parallel trends plot
-# we can set `combine = TRUE` when calling `plot_parallel_trends()`
-# which will combine all treatment silos into a single line, and all
-# control silos into a single line.
-trends <- plot_parallel_trends(
-  dir_path,
-  combine = TRUE, # Plots one line for control and one line for treated
-  simplify_legend = TRUE, # Reduces legend to simply "Control" and "Treated"
-  lwd = 3,                 # Set line width
-  ylim = c(0.2, 0.6),          # (min, max) of y-axis
-  xdates = as.Date(c("1989-01-01",
-                     "1991-01-01",
-                     "1993-01-01", # Explicity declare dates on x-axis
-                     "1995-01-01",
-                     "1997-01-01",
-                     "1999-01-01")),
-  date_format = "%Y", # Specify x-axis date format
-  ylabels = c(0.2, 0.4, 0.6), # Values on y-axis
-  legend_location = "topright", # Where should the legend go?
-  treatment_indicator_lwd = 2, # line width for the treatment indicator lines
-  treatment_indicator_alpha = 0.2, # transparency for treatment indicator lines
-  treatment_indicator_col = "red" # colour for treatment indicator lines
-)
-head(trends, 4)
+plot(results)
+
+## ----fig.width=6, fig.height=4, out.width = "70%", dpi=300, fig.align="center"----
+plot(results, event = TRUE)
+
+## -----------------------------------------------------------------------------
+citation("undidR")
+
+## -----------------------------------------------------------------------------
+print(citation("undidR"), bibtex = TRUE)
 
