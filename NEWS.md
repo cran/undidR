@@ -1,3 +1,9 @@
+# undidR 3.0.1
+
+* Added the `lwd` and `legend` parameters to the S3 `plot()` method for `UnDiDObj` which controls line width and legend locations, respectively. Removed the default titles of plots.
+* Also made other minor aesthetic changes to the default plots, such as adding horizontal bars to the ends of the event study plot confidence bands (like the letter I).
+* Removed "none" as an aggregation option for staggered adoption.
+
 # undidR 3.0.0
 
 * Added new aggregation methods for staggered adoption: `"sgt"`, `"time"`, and `"none"`.

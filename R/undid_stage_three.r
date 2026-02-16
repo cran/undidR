@@ -2,7 +2,8 @@
 #'
 #' Takes in all of the filled diff df CSV files and uses them to compute
 #' group level ATTs as well as the aggregate ATT and its standard errors
-#' and p-values.
+#' and p-values. Also takes in the trends data CSV files and uses them
+#' to produce parallel trends and event study plots.
 #'
 #' @param dir_path A character specifying the filepath to the folder containing
 #'  all of the filled diff df CSV files.
@@ -43,7 +44,7 @@
 #'  to find a new unique random permutations during the randomization
 #' inference procedure. Defaults to `100`.
 #'
-#' @returns An UnDiDObj with S3 methods of `summary()`, `citation()`,
+#' @returns An UnDiDObj with S3 methods of `summary()`, `plot()`,
 #'  `print()`, and `coef()`.
 #'
 #' @examples
@@ -53,10 +54,19 @@
 #' \donttest{
 #'    # Recommended: nperm >= 399 for reasonable precision
 #'    # (~15 seconds on typical hardware)
-#'    undid_stage_three(dir, agg = "g", nperm = 399, verbose = NULL)
+#'    result <- undid_stage_three(dir, agg = "g", nperm = 399, verbose = NULL)
+#'
+#'    # View the summary of results
+#'    summary(result)
+#'
+#'    # View the parallel trends plot
+#'    plot(result)
+#'
+#'    # View the event study plot
+#'    plot(result, event = TRUE)
 #' }
 #' @importFrom stats pt qt
-#' @importFrom grDevices colorRampPalette
+#' @importFrom grDevices colorRampPalette adjustcolor
 #' @importFrom graphics plot lines segments abline legend axis
 #' @export
 undid_stage_three <- function(dir_path, agg = "g", weights = "both",
@@ -167,6 +177,9 @@ undid_stage_three <- function(dir_path, agg = "g", weights = "both",
     if (agg %in% c("g", "gt", "time")) {
       agg <- "none"
     }
+  } else if ("diff_times" %in% names(diff_df) && agg == "none") {
+    warning("'agg' cannot be 'none' for staggered adoption. Setting 'agg = g'")
+    agg <- "g"
   }
   # Check that if agg is none that weighting is not both or att
   if (agg == "none" && weights %in% c("att", "both")) {
@@ -599,10 +612,16 @@ coef.UnDiDObj <- function(object, level = c("agg", "sub"), ...) {
 #'   as c(start, end). Default is \code{NULL} (use all available periods).
 #' @param ci Numeric between 0 and 1 specifying confidence level.
 #'   Default is 0.95.
+#' @param lwd Linewidth arg passed to `lines()`, `abline()`, and `segments()`.
+#'  Defaults to `1`.
+#' @param legend Keywords for indicating desired legend location. Defaults to
+#'  `"topright"`. Other options include any of the keywords used as
+#'  x in `legend(x, ...)` or `NULL` to omit a legend.
 #' @param ... other arguments passed to plot
 #' @export
 plot.UnDiDObj <- function(x, event = FALSE,
-                          event_window = NULL, ci = 0.95, ...) {
+                          event_window = NULL, ci = 0.95,
+                          lwd = 1, legend = "topright", ...) {
   if (ci <= 0 || ci >= 1) {
     stop("`ci` must be between 0 and 1")
   }
@@ -692,25 +711,41 @@ plot.UnDiDObj <- function(x, event = FALSE,
          type = "n",
          xlab = "Periods Since Treatment",
          ylab = ylab,
-         main = "Event Study Plot",
          ylim = y_range,
          ...)
 
     # Add confidence intervals if available
     for (i in seq_len(nrow(event_data))) {
       if (!is.na(event_data$ci_lower[i]) && !is.na(event_data$ci_upper[i])) {
-        segments(event_data$time_since_treatment[i], event_data$ci_lower[i],
-                 event_data$time_since_treatment[i], event_data$ci_upper[i],
-                 col = "gray70", lwd = 2)
+        x_pos <- event_data$time_since_treatment[i]
+
+        # Vertical line (the main CI bar)
+        segments(x_pos, event_data$ci_lower[i],
+                 x_pos, event_data$ci_upper[i],
+                 col = "skyblue", lwd = lwd / 1.2)
+
+        # Horizontal caps
+        cap_width <- 0.1
+
+        # Bottom cap
+        segments(x_pos - cap_width, event_data$ci_lower[i],
+                 x_pos + cap_width, event_data$ci_lower[i],
+                 col = "skyblue", lwd = lwd / 1.2)
+
+        # Top cap
+        segments(x_pos - cap_width, event_data$ci_upper[i],
+                 x_pos + cap_width, event_data$ci_upper[i],
+                 col = "skyblue", lwd = lwd / 1.2)
       }
     }
 
     # Add points and line
     lines(event_data$time_since_treatment, event_data$y,
-          type = "b", pch = 16, lwd = 2)
+          type = "b", pch = 16, lwd = lwd)
 
     # Add vertical line at treatment time
-    abline(v = 0, lty = 2, col = "red")
+    abline(v = 0, lty = 2, col = adjustcolor("red", alpha.f = 0.5),
+           lwd = lwd / 1.2)
 
   } else {
     # Parallel trends plot
@@ -736,7 +771,6 @@ plot.UnDiDObj <- function(x, event = FALSE,
          ylim = range(trends$y, na.rm = TRUE),
          xlab = "Time Period",
          ylab = ylab,
-         main = "Parallel Trends",
          xaxt = "n",  # Suppress automatic x-axis
          ...)
 
@@ -752,7 +786,7 @@ plot.UnDiDObj <- function(x, event = FALSE,
       lty <- if (silo_data$treatment_time[1] == "control") 2 else 1
 
       lines(silo_data$period, silo_data$y,
-            col = colors[i], lwd = 2, lty = lty)
+            col = colors[i], lwd = lwd, lty = lty)
     }
 
     # Add vertical lines for treatment times
@@ -765,23 +799,23 @@ plot.UnDiDObj <- function(x, event = FALSE,
         tt_period <- match(as.Date(tt_date, origin = "1970-01-01"),
                            sort(unique(trends$time)))
         if (!is.na(tt_period)) {
-          abline(v = tt_period, lty = 3, col = "red")
+          abline(v = tt_period, lty = 3, col = "red", lwd = lwd / 1.2)
         }
       }
     }
 
     # Add legend
-    legend("topright",
-           legend = silos,
-           col = colors,
-           lwd = 2,
-           lty = ifelse(sapply(silos, function(s) {
-             trends$treatment_time[trends$silo_name == s][1] == "control"
-           }), 2, 1),
-           cex = 0.7)
+    if (!is.null(legend)) {
+      legend(legend,
+             legend = silos,
+             col = colors,
+             lwd = lwd,
+             lty = ifelse(sapply(silos, function(s) {
+               trends$treatment_time[trends$silo_name == s][1] == "control"
+             }), 2, 1),
+             cex = 0.7)
+    }
   }
-
-  
 }
 
 #' @keywords internal

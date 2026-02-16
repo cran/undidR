@@ -4,7 +4,15 @@
 \alias{plot.UnDiDObj}
 \title{Plot method for \code{UnDiDObj}}
 \usage{
-\method{plot}{UnDiDObj}(x, event = FALSE, event_window = NULL, ci = 0.95, ...)
+\method{plot}{UnDiDObj}(
+  x,
+  event = FALSE,
+  event_window = NULL,
+  ci = 0.95,
+  lwd = 1,
+  legend = "topright",
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{UnDiDObj} object}
@@ -17,6 +25,13 @@ as c(start, end). Default is \code{NULL} (use all available periods).}
 
 \item{ci}{Numeric between 0 and 1 specifying confidence level.
 Default is 0.95.}
+
+\item{lwd}{Linewidth arg passed to \code{lines()}, \code{abline()}, and \code{segments()}.
+Defaults to \code{1}.}
+
+\item{legend}{Keywords for indicating desired legend location. Defaults to
+\code{"topright"}. Other options include any of the keywords used as
+x in \code{legend(x, ...)} or \code{NULL} to omit a legend.}
 
 \item{...}{other arguments passed to plot}
 }

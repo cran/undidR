@@ -82,17 +82,6 @@ test_that("undid_stage_three() works for staggered adoption, agg = time",
   }
 )
 
-test_that("undid_stage_three() works for staggered adoption, agg = none",
-  { expect_warning({
-    dir <- system.file("extdata/staggered", package = "undidR")
-    result <- undid_stage_three(dir, agg = "none", weights = "diff",
-                                nperm = 10, verbose = NULL)
-    expect_equal(round(result$agg$att[1], 6), round(0.04825196, 6))
-  }, "'nperm' is less than 399."
-  )
-  }
-)
-
 test_that("covariates argument works",
   { expect_warning({
     dir <- system.file("extdata/staggered", package = "undidR")
@@ -108,8 +97,8 @@ test_that("works with some missing data", {
   dir <- system.file("extdata/errors/missingdata", package = "undidR")
   data_list <- list()
   # Each agg method will produce warnings about missing data and RI
-  for (i in seq_along(c("g", "gt", "sgt", "silo", "time", "none"))) {
-    agg <- c("g", "gt", "sgt", "silo", "time", "none")[i]
+  for (i in seq_along(c("g", "gt", "sgt", "silo", "time"))) {
+    agg <- c("g", "gt", "sgt", "silo", "time")[i]
     expect_warning(
       expect_warning(
         {
@@ -126,9 +115,9 @@ test_that("works with some missing data", {
     expect_s3_class(data_list[[i]], "UnDiDObj")
   }
   # Test specific value from last result (agg = "none")
-  expect_equal(round(data_list[[6]]$agg$att[1], 6), round(0.04870773, 6))
-  # Verify all 6 methods produced results
-  expect_equal(length(data_list), 6)
+  expect_equal(round(data_list[[5]]$agg$att[1], 6), round(0.05000527, 6))
+  # Verify all 5 methods produced results
+  expect_equal(length(data_list), 5)
 })
 
 test_that("undid_stage_three() works with atypical options",
@@ -146,72 +135,47 @@ test_that("S3 methods work for all aggregation methods", {
   # Test with (missing) staggered adoption data
   dir_staggered <- system.file("extdata/errors/missingdata", package = "undidR")
 
-  agg_methods <- c("g", "gt", "sgt", "silo", "time", "none")
+  agg_methods <- c("g", "gt", "sgt", "silo", "time")
 
   for (agg in agg_methods) {
     # Expect warnings about missing data and RI
     # For agg = "none", there's an additional warning about weights
-    if (agg == "none") {
+    expect_warning(
       expect_warning(
-        expect_warning(
-          expect_warning(
-            {
-              obj <- undid_stage_three(dir_staggered, agg = agg, nperm = 10,
-                                       covariates = TRUE, verbose = NULL)
-            },
-            "If 'agg = none' then 'weights' can only be either 'none' or 'diff'"
-          ),
-          "Missing value count for diff_estimate_covariates"
-        ),
-        "missing differences for gt values required"
-      )
-    } else {
-      expect_warning(
-        expect_warning(
-          {
-            obj <- undid_stage_three(dir_staggered, agg = agg, nperm = 10,
-                                     covariates = TRUE, verbose = NULL)
-          },
-          "Missing value count for diff_estimate_covariates"
-        ),
-        "missing differences for gt values required"
-      )
-    }
+        {
+          obj <- undid_stage_three(dir_staggered, agg = agg, nperm = 10,
+                                   covariates = TRUE, verbose = NULL)
+        },
+        "Missing value count for diff_estimate_covariates"
+      ),
+      "missing differences for gt values required"
+    )
 
     # Test print method
     expect_output(print(obj, level = "agg"), "Aggregate ATT")
     expect_output(print(obj, level = "agg"), agg)
 
-    if (agg != "none") {
-      expect_output(print(obj, level = "sub"), "Sub-Aggregate ATTs")
-    } else {
-      expect_output(print(obj, level = "sub"), "No sub-aggregate estimates")
-    }
+    expect_output(print(obj, level = "sub"), "Sub-Aggregate ATTs")
 
     # Test summary method
     expect_output(summary(obj, level = "agg"), "Aggregate Results")
     expect_output(summary(obj, level = "agg"), "ATT")
     expect_output(summary(obj, level = "all"), "Weighting")
 
-    if (agg != "none") {
-      expect_output(summary(obj, level = "sub"), "Subaggregate Results")
-      expect_output(summary(obj, level = "all"), "Weight")
-    }
+    expect_output(summary(obj, level = "sub"), "Subaggregate Results")
+    expect_output(summary(obj, level = "all"), "Weight")
 
     # Test coef method
     coef_agg <- coef(obj, level = "agg")
     expect_true(is.numeric(coef_agg))
     expect_length(coef_agg, 1)
 
-    if (agg != "none") {
-      coef_sub <- coef(obj, level = "sub")
-      expect_s3_class(coef_sub, "data.frame")
-      expect_true("Group" %in% names(coef_sub))
-      expect_true("ATT" %in% names(coef_sub))
-      expect_true(nrow(coef_sub) > 0)
-    } else {
-      expect_output(coef(obj, level = "sub"), "No sub-aggregate estimates")
-    }
+    coef_sub <- coef(obj, level = "sub")
+    expect_s3_class(coef_sub, "data.frame")
+    expect_true("Group" %in% names(coef_sub))
+    expect_true("ATT" %in% names(coef_sub))
+    expect_true(nrow(coef_sub) > 0)
+
   }
 })
 

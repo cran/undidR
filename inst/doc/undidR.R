@@ -101,10 +101,11 @@ head(results$trends, 4)
 
 summary(results)
 
-plot(results)
+plot(results, main = "My Parallel Trends Plot")
 
 ## ----fig.width=6, fig.height=4, out.width = "70%", dpi=300, fig.align="center"----
-plot(results, event = TRUE)
+plot(results, event = TRUE, ci = 0.9, event_window = c(-2, 5),
+     main = "My Event Study Plot")
 
 ## -----------------------------------------------------------------------------
 citation("undidR")

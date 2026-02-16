@@ -15,7 +15,7 @@ status](https://www.r-pkg.org/badges/version/undidR)](https://CRAN.R-project.org
 The **undidR** package provides the framework for implementing
 difference-in-differences with unpoolable data (UNDID) developed in
 [Karim, Webb, Austin, and Strumpf
-(2024)](https://arxiv.org/abs/2403.15910v2). UNDID is designed to
+(2025)](https://arxiv.org/abs/2403.15910v2). UNDID is designed to
 estimate the average treatment effect on the treated (ATT) in settings
 where data from different silos cannot be pooled together (potentially
 for reasons of confidentiality). The package supports both common and
@@ -59,7 +59,7 @@ init <- create_init_csv(silo_names = c("73", "46", "54", "23", "86", "32",
                         treatment_times = c(rep("control", 6),
                                             "1991", "1993", "1996", "1997",
                                             "1997", "1998"))
-#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/init.csv
+#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/init.csv
 init
 #>    silo_name start_time end_time treatment_time
 #> 1         73       1989     2000        control
@@ -80,7 +80,7 @@ init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
 empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
                                 freq = "yearly",
                                 covariates = c("asian", "black", "male"))
-#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/empty_diff_df.csv
+#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/empty_diff_df.csv
 head(empty_diff_df, 4)
 #>   silo_name gvar treat diff_times        gt RI start_time end_time weights
 #> 1        73 1991     0  1991;1990 1991;1991  0       1989     2000    both
@@ -108,8 +108,8 @@ empty_diff_filepath <- system.file("extdata/staggered", "empty_diff_df.csv",
 stage2 <- undid_stage_two(empty_diff_filepath, silo_name = "71",
                           silo_df = silo_data, time_column = "year",
                           outcome_column = "coll", silo_date_format = "yyyy")
-#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/filled_diff_df_71.csv
-#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpekLAIM/trends_data_71.csv
+#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/filled_diff_df_71.csv
+#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/trends_data_71.csv
 head(stage2$diff_df, 4)
 #>   silo_name gvar treat diff_times        gt RI start_time end_time weights
 #> 1        71 1991     1  1991;1990 1991;1991  0       1989     2000    both
@@ -159,14 +159,34 @@ summary(results)
 #> 
 #> Aggregate Results:
 #>        ATT Std. Error    p-value RI p-value Jackknife SE Jackknife p-value
-#>  0.0727396 0.02600099 0.04893262 0.05764411   0.03619008        0.06960867
+#>  0.0727396 0.02600099 0.04893262 0.06766917   0.03619008        0.06960867
 #> 
 #> Subaggregate Results:
 #> Treatment Time              ATT         SE    p-value   RI p-val      JK SE   JK p-val     Weight
 #> -------------------------------------------------------------------------------------------------------------- 
-#> 1991                     0.0434     0.0252     0.0899     0.3459         NA         NA     0.2428
-#> 1993                     0.0478     0.0242     0.0528     0.4311         NA         NA     0.2305
-#> 1996                     0.0451     0.0353     0.2106     0.6190         NA         NA     0.0910
-#> 1997                     0.1322     0.0294     0.0001     0.0602     0.0532     0.0302     0.3863
-#> 1998                    -0.0812     0.0602     0.1937     0.3108         NA         NA     0.0494
+#> 1991                     0.0434     0.0252     0.0899     0.3860         NA         NA     0.2428
+#> 1993                     0.0478     0.0242     0.0528     0.4511         NA         NA     0.2305
+#> 1996                     0.0451     0.0353     0.2106     0.5589         NA         NA     0.0910
+#> 1997                     0.1322     0.0294     0.0001     0.0576     0.0532     0.0302     0.3863
+#> 1998                    -0.0812     0.0602     0.1937     0.2957         NA         NA     0.0494
 ```
+
+``` r
+plot(results, lwd = 2, legend = "topleft")
+```
+
+<img src="man/figures/README-parallel-trends-plot-1.png" width="70%" style="display: block; margin: auto;" />
+
+The S3 method of `plot()` for an UnDiDObj accepts parameters inherited
+from default `plot()` such as `main`, as well as the additional
+parameters of: `ci` (confidence interval), `event_window` (periods
+before / after treatment to plot), and `event` (TRUE or FALSE to plot
+either event study or parallel trends plots).
+
+``` r
+
+plot(results, event = TRUE, ci = 0.9, event_window = c(-2, 5),
+     main = "My Event Study Plot", lwd = 2)
+```
+
+<img src="man/figures/README-event-study-plot-1.png" width="70%" style="display: block; margin: auto;" />

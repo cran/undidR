@@ -71,13 +71,14 @@ to find a new unique random permutations during the randomization
 inference procedure. Defaults to \code{100}.}
 }
 \value{
-An UnDiDObj with S3 methods of \code{summary()}, \code{citation()},
+An UnDiDObj with S3 methods of \code{summary()}, \code{plot()},
 \code{print()}, and \code{coef()}.
 }
 \description{
 Takes in all of the filled diff df CSV files and uses them to compute
 group level ATTs as well as the aggregate ATT and its standard errors
-and p-values.
+and p-values. Also takes in the trends data CSV files and uses them
+to produce parallel trends and event study plots.
 }
 \examples{
 
@@ -86,6 +87,15 @@ dir <- system.file("extdata/staggered", package = "undidR")
 \donttest{
    # Recommended: nperm >= 399 for reasonable precision
    # (~15 seconds on typical hardware)
-   undid_stage_three(dir, agg = "g", nperm = 399, verbose = NULL)
+   result <- undid_stage_three(dir, agg = "g", nperm = 399, verbose = NULL)
+
+   # View the summary of results
+   summary(result)
+
+   # View the parallel trends plot
+   plot(result)
+
+   # View the event study plot
+   plot(result, event = TRUE)
 }
 }
