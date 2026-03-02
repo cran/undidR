@@ -39,7 +39,7 @@
 #'  respective `anonymize_size` values. Defaults to `FALSE`.
 #' @param hc Specify which heteroskedasticity-consistent covariance matrix
 #'  estimator (HCCME) should be used. Options are `0`, `1`, `2`, `3`, and
-#'  `4` (or `"hc0"`, `"hc1"`, `"hc2"`, `"hc3"`, `"hc4"`).
+#'  `4` (or `"hc0"`, `"hc1"`, `"hc2"`, `"hc3"`, `"hc4"`). Defaults to `"hc1"`.
 #' @param max_attempts A numeric value. Sets the maximum number of attempts
 #'  to find a new unique random permutations during the randomization
 #' inference procedure. Defaults to `100`.
@@ -72,7 +72,7 @@
 undid_stage_three <- function(dir_path, agg = "g", weights = "both",
                               covariates = FALSE, notyet = FALSE,
                               nperm = 999, verbose = 100,
-                              check_anon_size = FALSE, hc = "hc3",
+                              check_anon_size = FALSE, hc = "hc1",
                               only = NULL, omit = NULL, max_attempts = 100) {
 
   # Check logical args
@@ -154,6 +154,10 @@ undid_stage_three <- function(dir_path, agg = "g", weights = "both",
   if (!is.null(omit)) {
     diff_df <- diff_df[!diff_df$silo_name %in% omit, ]
     trends <- trends[!trends$silo_name %in% omit, ]
+  }
+  if (nrow(diff_df) == 0) {
+    stop("No data remaining after applying 'only'/'omit' filters. ",
+           "Check that the silo names match those in the data.")
   }
   if ("diff_times" %in% names(diff_df)) {
     diff_df <- diff_df[order(diff_df$gvar, diff_df$t), ]
@@ -857,7 +861,7 @@ plot.UnDiDObj <- function(x, event = FALSE,
     results <- data.frame(agg_att = NA_real_, agg_att_se = NA_real_,
                           agg_att_pval = NA_real_, agg_att_jknife_se = NA_real_,
                           agg_att_jknife_pval = NA_real_,
-                          agg_att_ri_pval = NA_real_, 
+                          agg_att_ri_pval = NA_real_,
                           nperm = NA_real_)
     mask <- diff_df$treat != -1
     subset <- diff_df[mask, ]
@@ -869,6 +873,11 @@ plot.UnDiDObj <- function(x, event = FALSE,
       w <- w / sum(w, na.rm = TRUE)
     }
     reg <- .regress(x, y, w = w, hc = hc)  # nolint: object_usage_linter
+
+    # Compute SE edge case
+    if ((is.na(reg$beta_hat_se)) && (length(y) == 2) && (hc == "hc1")) {
+      reg$beta_hat_se <- sqrt(sum(subset$y_var))
+    }
     results$agg_att[1] <- reg$beta_hat
     results$agg_att_se[1] <- reg$beta_hat_se
     results$agg_att_pval[1] <- reg$beta_hat_pval
@@ -921,6 +930,12 @@ plot.UnDiDObj <- function(x, event = FALSE,
 
     # Run regression, store results
     reg <- .regress(x, y, w = w, hc = hc)  # nolint: object_usage_linter
+
+    # Check for edge case
+    if ((is.na(reg$beta_hat_se)) && (length(y) == 2) &&
+          (hc == "hc1") && (agg != "time")) {
+      reg$beta_hat_se <- sqrt(sum(subset$y_var))
+    }
     results$sub_att[i] <- reg$beta_hat
     results$sub_se[i] <- reg$beta_hat_se
     results$sub_pval[i] <- reg$beta_hat_pval

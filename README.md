@@ -59,7 +59,7 @@ init <- create_init_csv(silo_names = c("73", "46", "54", "23", "86", "32",
                         treatment_times = c(rep("control", 6),
                                             "1991", "1993", "1996", "1997",
                                             "1997", "1998"))
-#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/init.csv
+#> init.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpAluOGo/init.csv
 init
 #>    silo_name start_time end_time treatment_time
 #> 1         73       1989     2000        control
@@ -80,7 +80,7 @@ init_filepath <- normalizePath(file.path(tempdir(), "init.csv"),
 empty_diff_df <- create_diff_df(init_filepath, date_format = "yyyy",
                                 freq = "yearly",
                                 covariates = c("asian", "black", "male"))
-#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/empty_diff_df.csv
+#> empty_diff_df.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpAluOGo/empty_diff_df.csv
 head(empty_diff_df, 4)
 #>   silo_name gvar treat diff_times        gt RI start_time end_time weights
 #> 1        73 1991     0  1991;1990 1991;1991  0       1989     2000    both
@@ -108,8 +108,8 @@ empty_diff_filepath <- system.file("extdata/staggered", "empty_diff_df.csv",
 stage2 <- undid_stage_two(empty_diff_filepath, silo_name = "71",
                           silo_df = silo_data, time_column = "year",
                           outcome_column = "coll", silo_date_format = "yyyy")
-#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/filled_diff_df_71.csv
-#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpIDXxEE/trends_data_71.csv
+#> filled_diff_df_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpAluOGo/filled_diff_df_71.csv
+#> trends_data_71.csv saved to: C:/Users/Eric Bruce Jamieson/AppData/Local/Temp/RtmpAluOGo/trends_data_71.csv
 head(stage2$diff_df, 4)
 #>   silo_name gvar treat diff_times        gt RI start_time end_time weights
 #> 1        71 1991     1  1991;1990 1991;1991  0       1989     2000    both
@@ -117,10 +117,10 @@ head(stage2$diff_df, 4)
 #> 3        71 1991     1  1993;1990 1991;1993  0       1989     2000    both
 #> 4        71 1991     1  1994;1990 1991;1994  0       1989     2000    both
 #>   diff_estimate    diff_var diff_estimate_covariates diff_var_covariates
-#> 1    0.12916667 0.009447555              0.116348472         0.009397021
-#> 2    0.06916667 0.008602222              0.069515594         0.008272557
-#> 3    0.02546296 0.007975422              0.005133291         0.007767637
-#> 4    0.02703901 0.008564103              0.029958108         0.008338060
+#> 1    0.12916667 0.009655194              0.116348472         0.009930942
+#> 2    0.06916667 0.008781435              0.069515594         0.008624581
+#> 3    0.02546296 0.008134930              0.005133291         0.008084684
+#> 4    0.02703901 0.008748277              0.029958108         0.008704568
 #>         covariates date_format   freq   n n_t anonymize_size
 #> 1 asian;black;male        yyyy 1 year  93  45             NA
 #> 2 asian;black;male        yyyy 1 year  98  50             NA
@@ -159,16 +159,16 @@ summary(results)
 #> 
 #> Aggregate Results:
 #>        ATT Std. Error    p-value RI p-value Jackknife SE Jackknife p-value
-#>  0.0727396 0.02600099 0.04893262 0.06766917   0.03619008        0.06960867
+#>  0.0727396 0.02600099 0.04893262 0.05012531   0.03619008        0.06960867
 #> 
 #> Subaggregate Results:
 #> Treatment Time              ATT         SE    p-value   RI p-val      JK SE   JK p-val     Weight
 #> -------------------------------------------------------------------------------------------------------------- 
-#> 1991                     0.0434     0.0252     0.0899     0.3860         NA         NA     0.2428
-#> 1993                     0.0478     0.0242     0.0528     0.4511         NA         NA     0.2305
-#> 1996                     0.0451     0.0353     0.2106     0.5589         NA         NA     0.0910
-#> 1997                     0.1322     0.0294     0.0001     0.0576     0.0532     0.0302     0.3863
-#> 1998                    -0.0812     0.0602     0.1937     0.2957         NA         NA     0.0494
+#> 1991                     0.0434     0.0252     0.0899     0.3258         NA         NA     0.2428
+#> 1993                     0.0478     0.0242     0.0528     0.4536         NA         NA     0.2305
+#> 1996                     0.0451     0.0353     0.2106     0.6065         NA         NA     0.0910
+#> 1997                     0.1322     0.0294     0.0001     0.0627     0.0532     0.0302     0.3863
+#> 1998                    -0.0812     0.0602     0.1937     0.2657         NA         NA     0.0494
 ```
 
 ``` r

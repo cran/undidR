@@ -13,7 +13,7 @@ undid_stage_three(
   nperm = 999,
   verbose = 100,
   check_anon_size = FALSE,
-  hc = "hc3",
+  hc = "hc1",
   only = NULL,
   omit = NULL,
   max_attempts = 100
@@ -60,7 +60,7 @@ respective \code{anonymize_size} values. Defaults to \code{FALSE}.}
 
 \item{hc}{Specify which heteroskedasticity-consistent covariance matrix
 estimator (HCCME) should be used. Options are \code{0}, \code{1}, \code{2}, \code{3}, and
-\code{4} (or \code{"hc0"}, \code{"hc1"}, \code{"hc2"}, \code{"hc3"}, \code{"hc4"}).}
+\code{4} (or \code{"hc0"}, \code{"hc1"}, \code{"hc2"}, \code{"hc3"}, \code{"hc4"}). Defaults to \code{"hc1"}.}
 
 \item{only}{A character vector of silos to include. Defaults to \code{NULL}.}
 

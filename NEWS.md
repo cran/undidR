@@ -1,3 +1,8 @@
+# undidR 3.0.2
+* Computation of HCCMEs is now faster by using a crossproduct approach rather than constructing a full omega matrix.
+* Changed the default HCCME from HC3 to HC1 (i.e., `hc = 1`).
+* Fixed an issue where standard errors were returning `NA` for certain edge cases.
+
 # undidR 3.0.1
 
 * Added the `lwd` and `legend` parameters to the S3 `plot()` method for `UnDiDObj` which controls line width and legend locations, respectively. Removed the default titles of plots.

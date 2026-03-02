@@ -1,3 +1,32 @@
+test_that("undid_stage_three() computes the edge case SE for common adoption",
+  {
+    dir <- system.file("extdata/common", package = "undidR")
+    # Expect both warnings and correct result
+    expect_warning(
+      expect_warning(
+        {
+          result <- undid_stage_three(dir, agg = "none", weights = "diff",
+                                      only = c("71", "73"))
+          expect_equal(round(result$agg$se, 3), 0.073)
+        },
+        "'nperm' is less than 399."
+      ),
+      "nperm.*only 1"
+    )
+  }
+)
+
+test_that("undid_stage_three() edge case SE computation staggered",
+  { expect_warning({
+    dir <- system.file("extdata/staggered", package = "undidR")
+    result <- undid_stage_three(dir, agg = "sgt", nperm = 1, verbose =  NULL,
+                                only = c("57", "73"))
+    expect_equal(any(is.na(result$sub$se)), FALSE)
+  }, "'nperm' is less than 399."
+  )
+  }
+)
+
 test_that("undid_stage_three() works for common adoption and nperm warnings",
   {
     dir <- system.file("extdata/common", package = "undidR")
